@@ -1,0 +1,33 @@
+
+
+/* Reset default browser spacing */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+.ticketing-chip {
+  transition: background 180ms ease, color 180ms ease, box-shadow 180ms ease;
+}
+
+.ticketing-chip:hover {
+  background: #ff7a00 !important;
+  color: white !important;
+  box-shadow: 0 12px 24px rgba(255, 122, 0, 0.24) !important;
+}
+
+.primary-cta {
+  transition: background 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+.primary-cta:hover {
+  background: #4f46e5 !important;
+  box-shadow: 0 12px 24px rgba(79, 70, 229, 0.28) !important;
+  transform: translateY(-1px);
+}

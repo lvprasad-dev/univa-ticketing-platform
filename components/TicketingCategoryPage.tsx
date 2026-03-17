@@ -1,0 +1,293 @@
+"use client"
+
+import Link from "next/link"
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react"
+
+type Listing = {
+  title: string
+  city: string
+  venue: string
+  area: string
+  price: string
+  lat: number
+  lon: number
+  meta: string
+}
+
+type Coordinates = {
+  lat: number
+  lon: number
+}
+
+type TicketingCategoryPageProps = {
+  category: string
+  heading: string
+  description: string
+  icon: string
+  listings: Listing[]
+}
+
+const selectedLocationKey = "univa-selected-location"
+const selectedLocationEvent = "univa-location-change"
+
+const toRadians = (value: number) => (value * Math.PI) / 180
+
+const getDistance = (
+  firstLat: number,
+  firstLon: number,
+  secondLat: number,
+  secondLon: number
+) => {
+  const earthRadiusKm = 6371
+  const deltaLat = toRadians(secondLat - firstLat)
+  const deltaLon = toRadians(secondLon - firstLon)
+  const originLat = toRadians(firstLat)
+  const targetLat = toRadians(secondLat)
+
+  const haversine =
+    Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
+    Math.cos(originLat) *
+      Math.cos(targetLat) *
+      Math.sin(deltaLon / 2) *
+      Math.sin(deltaLon / 2)
+
+  return 2 * earthRadiusKm * Math.atan2(Math.sqrt(haversine), Math.sqrt(1 - haversine))
+}
+
+const getCityFromLocation = (location: string) => {
+  const parts = location
+    .split(",")
+    .map((part) => part.trim())
+    .filter(Boolean)
+
+  return parts[parts.length - 1] || location
+}
+
+export default function TicketingCategoryPage({
+  category,
+  heading,
+  description,
+  icon,
+  listings,
+}: TicketingCategoryPageProps) {
+  const [currentCoordinates, setCurrentCoordinates] = useState<Coordinates | null>(null)
+  const locationLabel = useSyncExternalStore(
+    (onStoreChange) => {
+      if (typeof window === "undefined") {
+        return () => undefined
+      }
+
+      const handleLocationChange = () => onStoreChange()
+
+      window.addEventListener("storage", handleLocationChange)
+      window.addEventListener(selectedLocationEvent, handleLocationChange)
+
+      return () => {
+        window.removeEventListener("storage", handleLocationChange)
+        window.removeEventListener(selectedLocationEvent, handleLocationChange)
+      }
+    },
+    () => window.localStorage.getItem(selectedLocationKey) || "your location",
+    () => "your location"
+  )
+
+  useEffect(() => {
+    if (!navigator.geolocation) {
+      return
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setCurrentCoordinates({
+          lat: position.coords.latitude,
+          lon: position.coords.longitude,
+        })
+      },
+      () => {
+        setCurrentCoordinates(null)
+      }
+    )
+  }, [])
+
+  const selectedCity = useMemo(
+    () => getCityFromLocation(locationLabel),
+    [locationLabel]
+  )
+
+  const cityListings = useMemo(() => {
+    const filteredListings = listings.filter((listing) => listing.city === selectedCity)
+
+    if (!currentCoordinates) {
+      return filteredListings
+    }
+
+    return [...filteredListings].sort((firstListing, secondListing) => {
+      const firstDistance = getDistance(
+        currentCoordinates.lat,
+        currentCoordinates.lon,
+        firstListing.lat,
+        firstListing.lon
+      )
+      const secondDistance = getDistance(
+        currentCoordinates.lat,
+        currentCoordinates.lon,
+        secondListing.lat,
+        secondListing.lon
+      )
+
+      return firstDistance - secondDistance
+    })
+  }, [currentCoordinates, listings, selectedCity])
+
+  const visibleListings = cityListings.length > 0 ? cityListings : listings
+
+  return (
+    <main style={pageStyle}>
+      <section style={heroStyle}>
+        <p style={eyebrowStyle}>{category}</p>
+        <h1 style={titleStyle}>{heading}</h1>
+        <p style={textStyle}>{description}</p>
+        <p style={locationTextStyle}>
+          Showing options for <strong>{locationLabel}</strong>
+          {cityListings.length === 0 ? " with other cities as fallback." : "."}
+        </p>
+      </section>
+
+      <section style={gridStyle}>
+        {visibleListings.map((listing) => {
+          const distance =
+            currentCoordinates &&
+            getDistance(
+              currentCoordinates.lat,
+              currentCoordinates.lon,
+              listing.lat,
+              listing.lon
+            )
+
+          return (
+            <article key={`${listing.title}-${listing.venue}-${listing.area}`} style={cardStyle}>
+              <div style={posterStyle}>
+                <span style={posterIconStyle}>{icon}</span>
+              </div>
+              <h2 style={cardTitleStyle}>{listing.venue}</h2>
+              <p style={cardMetaStyle}>
+                {listing.area}, {listing.city}
+              </p>
+              <p style={cardMetaStyle}>{listing.title}</p>
+              <p style={cardMetaStyle}>{listing.meta}</p>
+              <p style={distanceStyle}>
+                {distance ? `${distance.toFixed(1)} km away` : "Distance unavailable"}
+              </p>
+              <p style={priceStyle}>{listing.price}</p>
+              <Link href="/checkout" className="primary-cta" style={actionStyle}>
+                Book Now
+              </Link>
+            </article>
+          )
+        })}
+      </section>
+    </main>
+  )
+}
+
+const pageStyle = {
+  marginTop: "55px",
+  minHeight: "100vh",
+  padding: "120px 32px 56px",
+  background: "linear-gradient(180deg, #fff8f1, #ffffff)",
+}
+
+const heroStyle = {
+  maxWidth: "840px",
+  margin: "0 auto 28px",
+  textAlign: "center" as const,
+}
+
+const eyebrowStyle = {
+  marginBottom: "10px",
+  color: "#ff7a00",
+  fontWeight: "700",
+  letterSpacing: "1px",
+  textTransform: "uppercase" as const,
+}
+
+const titleStyle = {
+  marginBottom: "10px",
+  color: "#171127",
+  fontSize: "40px",
+}
+
+const textStyle = {
+  color: "#5d6475",
+  fontSize: "18px",
+  lineHeight: 1.6,
+}
+
+const locationTextStyle = {
+  marginTop: "12px",
+  color: "#3f3a56",
+  fontSize: "16px",
+}
+
+const gridStyle = {
+  maxWidth: "1180px",
+  margin: "0 auto",
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+  gap: "24px",
+}
+
+const cardStyle = {
+  padding: "22px",
+  borderRadius: "24px",
+  background: "white",
+  boxShadow: "0 18px 36px rgba(37, 25, 77, 0.1)",
+}
+
+const posterStyle = {
+  height: "180px",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  borderRadius: "20px",
+  marginBottom: "18px",
+  background: "linear-gradient(135deg, #fff1e7, #f5f1ff)",
+}
+
+const posterIconStyle = {
+  fontSize: "54px",
+}
+
+const cardTitleStyle = {
+  marginBottom: "8px",
+  color: "#171127",
+  fontSize: "24px",
+}
+
+const cardMetaStyle = {
+  marginBottom: "6px",
+  color: "#5d6475",
+}
+
+const distanceStyle = {
+  marginBottom: "6px",
+  color: "#5a4bff",
+  fontWeight: "700",
+}
+
+const priceStyle = {
+  margin: "14px 0 18px",
+  color: "#ff7a00",
+  fontWeight: "700",
+  fontSize: "18px",
+}
+
+const actionStyle = {
+  display: "inline-block",
+  textDecoration: "none",
+  padding: "12px 18px",
+  borderRadius: "14px",
+  background: "#5a4bff",
+  color: "white",
+  fontWeight: "700",
+}
