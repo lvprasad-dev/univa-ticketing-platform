@@ -18,7 +18,10 @@ export default function LoginPage() {
 
   const router = useRouter()
   const searchParams = useSearchParams()
-  const signupMessage = searchParams.get("message") ?? ""
+  let signupMessage = ""
+  if (typeof window !== "undefined") {
+    signupMessage = searchParams.get("message") ?? ""
+  }
   const statusMessage = message || signupMessage
 
   const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
