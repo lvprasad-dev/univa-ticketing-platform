@@ -38,10 +38,14 @@ export default function SignupPage() {
 
     setLoading(true)
 
+    const emailRedirectTo =
+      typeof window !== "undefined" ? `${window.location.origin}/login` : undefined
+
     const { error: signUpError } = await supabase.auth.signUp({
       email: form.email,
       password: form.password,
       options: {
+        emailRedirectTo,
         data: {
           full_name: form.name,
           mobile: form.mobile,
@@ -117,10 +121,11 @@ export default function SignupPage() {
             style={{ ...inputStyle, flex: 1 }}
           />
 
-          <button type="button" style={verifyBtn} disabled>
-            Email auth
-          </button>
+          <span style={statusChipStyle}>Verifying...</span>
         </div>
+        <p style={helperText}>
+          Verification email is sent automatically after you complete sign up.
+        </p>
 
         <label>Mobile Number</label>
 
@@ -196,14 +201,24 @@ const inputStyle = {
   border: "1px solid #ccc",
 }
 
-const verifyBtn = {
+const statusChipStyle = {
   padding: "8px 10px",
   background: "#ff7a00",
   color: "white",
   border: "none",
   borderRadius: "6px",
-  cursor: "not-allowed",
-  opacity: 0.7,
+  display: "inline-flex",
+  alignItems: "center",
+  fontSize: "13px",
+  fontWeight: "700",
+  opacity: 0.9,
+}
+
+const helperText = {
+  marginTop: "-8px",
+  marginBottom: "12px",
+  fontSize: "12px",
+  color: "#6a564f",
 }
 
 const errorMessage = {
