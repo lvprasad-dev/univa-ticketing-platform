@@ -1,5 +1,5 @@
 "use client"
-
+import { AuthChangeEvent, Session } from "@supabase/supabase-js"
 import Link from "next/link"
 import Image from "next/image"
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react"
@@ -234,15 +234,17 @@ export default function Navbar() {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_, session) => {
-      const resolvedName =
-        session?.user.user_metadata?.full_name ||
-        session?.user.email?.split("@")[0] ||
-        "Guest User"
-      setIsLoggedIn(Boolean(session))
-      setProfileName(resolvedName)
-      setProfileEmail(session?.user.email || "")
-    })
+    } = supabase.auth.onAuthStateChange(
+      (_event: AuthChangeEvent, session: Session | null) => {
+        const resolvedName =
+          session?.user.user_metadata?.full_name ||
+          session?.user.email?.split("@")[0] ||
+          "Guest User"
+        setIsLoggedIn(Boolean(session))
+        setProfileName(resolvedName)
+        setProfileEmail(session?.user.email || "")
+      }
+    )
 
     return () => {
       isMounted = false
