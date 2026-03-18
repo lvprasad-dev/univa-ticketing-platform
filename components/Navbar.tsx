@@ -121,10 +121,9 @@ export default function Navbar() {
   const router = useRouter()
 
   const isLoginPage = pathname === "/login"
-  const isSignupPage = pathname === "/signup"
   const isProfilePage = pathname === "/profile"
   const isTicketingCategoryPage = ticketingLinks.some((link) => link.href === pathname)
-  const isSimpleNavbarPage = isLoginPage || isSignupPage || isTicketingCategoryPage
+  const isSimpleNavbarPage = isLoginPage || isTicketingCategoryPage
 
   const [location, setLocation] = useState("Detecting...")
   const [showCities, setShowCities] = useState(false)
@@ -449,18 +448,6 @@ export default function Navbar() {
           </h2>
         </div>
 
-        {isLoginPage && !isLoggedIn && (
-          <Link href="/signup">
-            <button style={filledAuthButtonStyle}>SignUp</button>
-          </Link>
-        )}
-
-        {isSignupPage && !isLoggedIn && (
-          <Link href="/login">
-            <button style={outlineAuthButtonStyle}>Login</button>
-          </Link>
-        )}
-
         {isTicketingCategoryPage && (
           <div style={moviesNavLinksStyle}>
             {ticketingLinks.map((link) => (
@@ -569,10 +556,6 @@ export default function Navbar() {
                   <Link href="/login">
                     <button style={outlineAuthButtonStyle}>Login</button>
                   </Link>
-
-                  <Link href="/signup">
-                    <button style={filledAuthButtonStyle}>SignUp</button>
-                  </Link>
                 </div>
               )}
             </div>
@@ -610,15 +593,6 @@ const menuButtonStyle = {
   border: "none",
   background: "transparent",
   padding: 0,
-}
-
-const filledAuthButtonStyle = {
-  background: "#6c63ff",
-  color: "white",
-  border: "none",
-  padding: "6px 14px",
-  borderRadius: "6px",
-  cursor: "pointer",
 }
 
 const outlineAuthButtonStyle = {

@@ -1,45 +1,45 @@
 "use client"
 
 import { FormEvent, useState } from "react"
-import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { supabase } from "@/lib/supabaseClient"
 
 type LoginPageClientProps = {
-  signupMessage: string
+  authMessage: string
 }
 
 export default function LoginPageClient({
-  signupMessage,
+  authMessage,
 }: LoginPageClientProps) {
-  const [loginType, setLoginType] = useState("email")
+  const [loginType, setLoginType] = useState<"email" | "mobile">("email")
   const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
   const [mobile, setMobile] = useState("")
   const [otp, setOtp] = useState("")
-  const [rememberMe, setRememberMe] = useState(false)
+  const [otpSent, setOtpSent] = useState(false)
   const [message, setMessage] = useState("")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
+  const [providerLoading, setProviderLoading] = useState<
+    "google" | "apple" | null
+  >(null)
 
   const router = useRouter()
-  const statusMessage = message || signupMessage
+  const statusMessage = message || authMessage
 
-  const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
+  const handleEmailContinue = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setError("")
     setMessage("")
-
-    if (loginType === "mobile") {
-      setError("Mobile login is not connected yet. Use email and password for now.")
-      return
-    }
-
     setLoading(true)
 
-    const { error: signInError } = await supabase.auth.signInWithPassword({
+    const emailRedirectTo =
+      typeof window !== "undefined" ? `${window.location.origin}/` : undefined
+
+    const { error: signInError } = await supabase.auth.signInWithOtp({
       email,
-      password,
+      options: {
+        emailRedirectTo,
+      },
     })
 
     setLoading(false)
@@ -49,109 +49,192 @@ export default function LoginPageClient({
       return
     }
 
-    if (!rememberMe) {
-      setMessage("Logged in for this browser session.")
+    setMessage("Check your email. We sent a secure login link.")
+  }
+
+  const handleSendOtp = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    setError("")
+    setMessage("")
+    setLoading(true)
+
+    const { error: signInError } = await supabase.auth.signInWithOtp({
+      phone: mobile,
+    })
+
+    setLoading(false)
+
+    if (signInError) {
+      setError(signInError.message)
+      return
+    }
+
+    setOtpSent(true)
+    setMessage("OTP sent to your mobile number.")
+  }
+
+  const handleVerifyOtp = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    setError("")
+    setMessage("")
+    setLoading(true)
+
+    const { error: verifyError } = await supabase.auth.verifyOtp({
+      phone: mobile,
+      token: otp,
+      type: "sms",
+    })
+
+    setLoading(false)
+
+    if (verifyError) {
+      setError(verifyError.message)
+      return
     }
 
     router.push("/")
   }
 
+  const handleOAuthLogin = async (provider: "google" | "apple") => {
+    setError("")
+    setMessage("")
+    setProviderLoading(provider)
+
+    const redirectTo =
+      typeof window !== "undefined" ? `${window.location.origin}/` : undefined
+
+    const { error: oauthError } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo,
+      },
+    })
+
+    if (oauthError) {
+      setProviderLoading(null)
+      setError(oauthError.message)
+    }
+  }
+
   return (
     <div style={container}>
       <div style={card}>
-        <h2 style={{ textAlign: "center", marginBottom: "20px" }}>
-          Login to UNIVA
-        </h2>
+        <h2 style={titleStyle}>Login to proceed</h2>
+
+        {statusMessage && <p style={successMessage}>{statusMessage}</p>}
+        {error && <p style={errorMessage}>{error}</p>}
+
+        <div style={providerStack}>
+          <button
+            type="button"
+            onClick={() => handleOAuthLogin("google")}
+            style={providerButtonStyle}
+            disabled={providerLoading !== null || loading}
+          >
+            {providerLoading === "google" ? "Opening Google..." : "Continue with Google"}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => handleOAuthLogin("apple")}
+            style={providerButtonStyle}
+            disabled={providerLoading !== null || loading}
+          >
+            {providerLoading === "apple" ? "Opening Apple..." : "Continue with Apple"}
+          </button>
+        </div>
+
+        <div style={dividerStyle}>
+          <span style={dividerLineStyle} />
+          <span style={dividerTextStyle}>or</span>
+          <span style={dividerLineStyle} />
+        </div>
 
         <div style={tabs}>
           <button
             type="button"
-            onClick={() => setLoginType("email")}
+            onClick={() => {
+              setLoginType("email")
+              setError("")
+              setMessage("")
+            }}
             style={loginType === "email" ? activeTab : normalTab}
           >
-            Email
+            Continue with Email
           </button>
 
           <button
             type="button"
-            onClick={() => setLoginType("mobile")}
+            onClick={() => {
+              setLoginType("mobile")
+              setError("")
+              setMessage("")
+            }}
             style={loginType === "mobile" ? activeTab : normalTab}
           >
-            Mobile
+            Continue with Mobile
           </button>
         </div>
 
-        <form onSubmit={handleLogin}>
-          {statusMessage && <p style={successMessage}>{statusMessage}</p>}
-          {error && <p style={errorMessage}>{error}</p>}
+        {loginType === "email" ? (
+          <form onSubmit={handleEmailContinue}>
+            <input
+              type="email"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              autoComplete="email"
+              style={input}
+              required
+            />
 
-          {loginType === "email" && (
-            <>
-              <input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                autoComplete="email"
-                style={input}
-                required
-              />
+            <p style={helperText}>
+              We will send a secure login link to your email.
+            </p>
 
-              <input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                autoComplete="current-password"
-                style={input}
-                required
-              />
+            <button style={loginBtn} disabled={loading || providerLoading !== null}>
+              {loading ? "Sending link..." : "Continue with Email"}
+            </button>
+          </form>
+        ) : (
+          <form onSubmit={otpSent ? handleVerifyOtp : handleSendOtp}>
+            <input
+              type="tel"
+              placeholder="Enter mobile number"
+              value={mobile}
+              onChange={(event) => setMobile(event.target.value)}
+              autoComplete="tel"
+              style={input}
+              required
+            />
 
-              <label style={checkboxLabel}>
-                <input
-                  type="checkbox"
-                  checked={rememberMe}
-                  onChange={(event) => setRememberMe(event.target.checked)}
-                />{" "}
-                Remember me
-              </label>
-            </>
-          )}
-
-          {loginType === "mobile" && (
-            <>
-              <input
-                placeholder="Mobile Number"
-                value={mobile}
-                onChange={(event) => setMobile(event.target.value)}
-                style={input}
-              />
-
-              <button type="button" style={otpBtn}>
-                Send OTP
-              </button>
-
+            {otpSent && (
               <input
                 placeholder="Enter OTP"
                 value={otp}
                 onChange={(event) => setOtp(event.target.value)}
                 style={input}
+                required
               />
+            )}
 
-              <p style={helperText}>
-                Mobile OTP login is still pending backend integration.
-              </p>
-            </>
-          )}
+            <p style={helperText}>
+              {otpSent
+                ? "Enter the OTP sent to your mobile number."
+                : "We will send a one-time OTP to your mobile number."}
+            </p>
 
-          <button style={loginBtn} disabled={loading}>
-            {loading ? "Logging in..." : "Login"}
-          </button>
-        </form>
-
-        <p style={{ textAlign: "center", marginTop: "15px" }}>
-          New to UNIVA? <Link href="/signup">Sign Up</Link>
-        </p>
+            <button style={loginBtn} disabled={loading || providerLoading !== null}>
+              {loading
+                ? otpSent
+                  ? "Verifying..."
+                  : "Sending OTP..."
+                : otpSent
+                  ? "Verify OTP"
+                  : "Continue with Mobile"}
+            </button>
+          </form>
+        )}
       </div>
     </div>
   )
@@ -168,24 +251,69 @@ const container = {
 }
 
 const card = {
-  width: "360px",
+  width: "420px",
   padding: "30px",
-  borderRadius: "12px",
+  borderRadius: "20px",
   background: "rgba(255,255,255,0.95)",
   boxShadow: "0 8px 25px rgba(0,0,0,0.15)",
+}
+
+const titleStyle = {
+  textAlign: "center" as const,
+  marginBottom: "8px",
+  fontWeight: "500",
+}
+
+const providerStack = {
+  display: "grid",
+  gap: "10px",
+  marginBottom: "18px",
+}
+
+const providerButtonStyle = {
+  width: "100%",
+  padding: "12px",
+  borderRadius: "10px",
+  border: "1px solid #d6d0e8",
+  background: "white",
+  color: "#241c3e",
+  fontWeight: "600",
+  cursor: "pointer",
+}
+
+const dividerStyle = {
+  display: "flex",
+  alignItems: "center",
+  gap: "10px",
+  marginBottom: "18px",
+}
+
+const dividerLineStyle = {
+  flex: 1,
+  height: "1px",
+  background: "#e3deee",
+}
+
+const dividerTextStyle = {
+  fontSize: "13px",
+  color: "#766d91",
 }
 
 const tabs = {
   display: "flex",
   marginBottom: "15px",
-  borderRadius: "8px",
-  overflow: "hidden",
+  borderRadius: "12px",
+  overflow: "hidden" as const,
+  background: "#f3efff",
+  padding: "4px",
+  gap: "4px",
 }
 
 const activeTab = {
   flex: 1,
   padding: "10px",
   border: "none",
+  borderRadius: "10px",
   background: "#5a4bff",
   color: "white",
   cursor: "pointer",
@@ -195,50 +323,37 @@ const normalTab = {
   flex: 1,
   padding: "10px",
   border: "none",
-  background: "#eee",
+  borderRadius: "10px",
+  background: "transparent",
+  color: "#4f4670",
   cursor: "pointer",
 }
 
 const input = {
   width: "100%",
-  padding: "10px",
+  padding: "12px",
   marginBottom: "12px",
-  borderRadius: "6px",
-  border: "1px solid #ccc",
-}
-
-const checkboxLabel = {
-  display: "block",
-  fontSize: "14px",
+  borderRadius: "10px",
+  border: "1px solid #d2cce3",
 }
 
 const loginBtn = {
   width: "100%",
-  padding: "10px",
-  marginTop: "15px",
+  padding: "12px",
+  marginTop: "10px",
   border: "none",
-  borderRadius: "6px",
+  borderRadius: "10px",
   background: "#5a4bff",
   color: "white",
   fontWeight: "bold",
   cursor: "pointer",
 }
 
-const otpBtn = {
-  width: "100%",
-  padding: "10px",
-  marginBottom: "12px",
-  border: "none",
-  borderRadius: "6px",
-  background: "#ff7a00",
-  color: "white",
-  fontWeight: "bold",
-  cursor: "pointer",
-}
-
 const helperText = {
+  marginTop: "-2px",
+  marginBottom: "12px",
   fontSize: "13px",
-  color: "#555",
+  color: "#625b79",
 }
 
 const errorMessage = {

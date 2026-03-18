@@ -8,9 +8,5 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   const resolvedSearchParams = searchParams ? await searchParams : {}
   const message = resolvedSearchParams.message
 
-  return (
-    <LoginPageClient
-      signupMessage={typeof message === "string" ? message : ""}
-    />
-  )
+  return <LoginPageClient authMessage={typeof message === "string" ? message : ""} />
 }
