@@ -230,7 +230,7 @@ export default function LoginPageClient({
                 : "We will send a one-time OTP to your mobile number."}
             </p>
 
-            <button style={loginBtn} disabled={loading || providerLoading !== null}>
+            <button style={mobileLoginBtn} disabled={loading || providerLoading !== null}>
               {loading
                 ? mobileOtpSent
                   ? "Verifying..."
@@ -392,6 +392,11 @@ const loginBtn = {
   color: "white",
   fontWeight: "bold",
   cursor: "pointer",
+}
+
+const mobileLoginBtn = {
+  ...loginBtn,
+  background: "#ff7a00",
 }
 
 const helperText = {
