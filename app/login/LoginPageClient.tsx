@@ -358,10 +358,11 @@ const activeTab = {
   padding: "10px",
   border: "none",
   borderRadius: "10px",
-  background: "#5a4bff",
-  color: "white",
+  background: "#eef0ff",
+  color: "#5a4bff",
   cursor: "pointer",
   boxShadow: "inset 0 -4px 0 #ff7a00",
+  fontWeight: "700",
 }
 
 const normalTab = {
@@ -370,8 +371,9 @@ const normalTab = {
   border: "none",
   borderRadius: "10px",
   background: "transparent",
-  color: "#4f4670",
+  color: "#5a4bff",
   cursor: "pointer",
+  fontWeight: "600",
 }
 
 const input = {
