@@ -13,9 +13,11 @@ export default function LoginPageClient({
 }: LoginPageClientProps) {
   const [loginType, setLoginType] = useState<"email" | "mobile">("email")
   const [email, setEmail] = useState("")
+  const [emailOtp, setEmailOtp] = useState("")
+  const [emailOtpSent, setEmailOtpSent] = useState(false)
   const [mobile, setMobile] = useState("")
-  const [otp, setOtp] = useState("")
-  const [otpSent, setOtpSent] = useState(false)
+  const [mobileOtp, setMobileOtp] = useState("")
+  const [mobileOtpSent, setMobileOtpSent] = useState(false)
   const [message, setMessage] = useState("")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
@@ -26,19 +28,16 @@ export default function LoginPageClient({
   const router = useRouter()
   const statusMessage = message || authMessage
 
-  const handleEmailContinue = async (event: FormEvent<HTMLFormElement>) => {
+  const handleSendEmailOtp = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setError("")
     setMessage("")
     setLoading(true)
 
-    const emailRedirectTo =
-      typeof window !== "undefined" ? `${window.location.origin}/` : undefined
-
     const { error: signInError } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        emailRedirectTo,
+        shouldCreateUser: true,
       },
     })
 
@@ -49,7 +48,30 @@ export default function LoginPageClient({
       return
     }
 
-    setMessage("Check your email. We sent a secure login link.")
+    setEmailOtpSent(true)
+    setMessage("OTP sent to your email.")
+  }
+
+  const handleVerifyEmailOtp = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    setError("")
+    setMessage("")
+    setLoading(true)
+
+    const { error: verifyError } = await supabase.auth.verifyOtp({
+      email,
+      token: emailOtp,
+      type: "email",
+    })
+
+    setLoading(false)
+
+    if (verifyError) {
+      setError(verifyError.message)
+      return
+    }
+
+    router.push("/")
   }
 
   const handleSendOtp = async (event: FormEvent<HTMLFormElement>) => {
@@ -69,11 +91,11 @@ export default function LoginPageClient({
       return
     }
 
-    setOtpSent(true)
+    setMobileOtpSent(true)
     setMessage("OTP sent to your mobile number.")
   }
 
-  const handleVerifyOtp = async (event: FormEvent<HTMLFormElement>) => {
+  const handleVerifyMobileOtp = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setError("")
     setMessage("")
@@ -81,7 +103,7 @@ export default function LoginPageClient({
 
     const { error: verifyError } = await supabase.auth.verifyOtp({
       phone: mobile,
-      token: otp,
+      token: mobileOtp,
       type: "sms",
     })
 
@@ -157,6 +179,8 @@ export default function LoginPageClient({
               setLoginType("email")
               setError("")
               setMessage("")
+              setMobileOtp("")
+              setMobileOtpSent(false)
             }}
             style={loginType === "email" ? activeTab : normalTab}
           >
@@ -169,6 +193,8 @@ export default function LoginPageClient({
               setLoginType("mobile")
               setError("")
               setMessage("")
+              setEmailOtp("")
+              setEmailOtpSent(false)
             }}
             style={loginType === "mobile" ? activeTab : normalTab}
           >
@@ -177,7 +203,7 @@ export default function LoginPageClient({
         </div>
 
         {loginType === "email" ? (
-          <form onSubmit={handleEmailContinue}>
+          <form onSubmit={emailOtpSent ? handleVerifyEmailOtp : handleSendEmailOtp}>
             <input
               type="email"
               placeholder="Enter your email"
@@ -188,16 +214,34 @@ export default function LoginPageClient({
               required
             />
 
+            {emailOtpSent && (
+              <input
+                placeholder="Enter OTP"
+                value={emailOtp}
+                onChange={(event) => setEmailOtp(event.target.value)}
+                style={input}
+                required
+              />
+            )}
+
             <p style={helperText}>
-              We will send a secure login link to your email.
+              {emailOtpSent
+                ? "Enter the OTP sent to your email."
+                : "We will send a one-time OTP to your email."}
             </p>
 
             <button style={loginBtn} disabled={loading || providerLoading !== null}>
-              {loading ? "Sending link..." : "Continue with Email"}
+              {loading
+                ? emailOtpSent
+                  ? "Verifying..."
+                  : "Sending OTP..."
+                : emailOtpSent
+                  ? "Verify OTP"
+                  : "Continue with Email"}
             </button>
           </form>
         ) : (
-          <form onSubmit={otpSent ? handleVerifyOtp : handleSendOtp}>
+          <form onSubmit={mobileOtpSent ? handleVerifyMobileOtp : handleSendOtp}>
             <input
               type="tel"
               placeholder="Enter mobile number"
@@ -208,28 +252,28 @@ export default function LoginPageClient({
               required
             />
 
-            {otpSent && (
+            {mobileOtpSent && (
               <input
                 placeholder="Enter OTP"
-                value={otp}
-                onChange={(event) => setOtp(event.target.value)}
+                value={mobileOtp}
+                onChange={(event) => setMobileOtp(event.target.value)}
                 style={input}
                 required
               />
             )}
 
             <p style={helperText}>
-              {otpSent
+              {mobileOtpSent
                 ? "Enter the OTP sent to your mobile number."
                 : "We will send a one-time OTP to your mobile number."}
             </p>
 
             <button style={loginBtn} disabled={loading || providerLoading !== null}>
               {loading
-                ? otpSent
+                ? mobileOtpSent
                   ? "Verifying..."
                   : "Sending OTP..."
-                : otpSent
+                : mobileOtpSent
                   ? "Verify OTP"
                   : "Continue with Mobile"}
             </button>
