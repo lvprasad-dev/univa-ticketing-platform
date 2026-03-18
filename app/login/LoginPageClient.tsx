@@ -268,7 +268,7 @@ export default function LoginPageClient({
                 : "We will send a one-time OTP to your email."}
             </p>
 
-            <button style={loginBtn} disabled={loading || providerLoading !== null}>
+            <button style={mobileLoginBtn} disabled={loading || providerLoading !== null}>
               {loading
                 ? emailOtpSent
                   ? "Verifying..."
