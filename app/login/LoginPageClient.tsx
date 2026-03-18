@@ -358,7 +358,7 @@ const activeTab = {
   padding: "10px",
   border: "none",
   borderRadius: "10px",
-  background: "#5a4bff",
+  background: "#ff7a00",
   color: "white",
   cursor: "pointer",
 }
