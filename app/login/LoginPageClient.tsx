@@ -11,7 +11,7 @@ type LoginPageClientProps = {
 export default function LoginPageClient({
   authMessage,
 }: LoginPageClientProps) {
-  const [loginType, setLoginType] = useState<"email" | "mobile">("email")
+  const [loginType, setLoginType] = useState<"email" | "mobile">("mobile")
   const [email, setEmail] = useState("")
   const [emailOtp, setEmailOtp] = useState("")
   const [emailOtpSent, setEmailOtpSent] = useState(false)
@@ -176,20 +176,6 @@ export default function LoginPageClient({
           <button
             type="button"
             onClick={() => {
-              setLoginType("email")
-              setError("")
-              setMessage("")
-              setMobileOtp("")
-              setMobileOtpSent(false)
-            }}
-            style={loginType === "email" ? activeTab : normalTab}
-          >
-            Continue with Email
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
               setLoginType("mobile")
               setError("")
               setMessage("")
@@ -200,47 +186,23 @@ export default function LoginPageClient({
           >
             Continue with Mobile
           </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setLoginType("email")
+              setError("")
+              setMessage("")
+              setMobileOtp("")
+              setMobileOtpSent(false)
+            }}
+            style={loginType === "email" ? activeTab : normalTab}
+          >
+            Continue with Email
+          </button>
         </div>
 
-        {loginType === "email" ? (
-          <form onSubmit={emailOtpSent ? handleVerifyEmailOtp : handleSendEmailOtp}>
-            <input
-              type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              autoComplete="email"
-              style={input}
-              required
-            />
-
-            {emailOtpSent && (
-              <input
-                placeholder="Enter OTP"
-                value={emailOtp}
-                onChange={(event) => setEmailOtp(event.target.value)}
-                style={input}
-                required
-              />
-            )}
-
-            <p style={helperText}>
-              {emailOtpSent
-                ? "Enter the OTP sent to your email."
-                : "We will send a one-time OTP to your email."}
-            </p>
-
-            <button style={loginBtn} disabled={loading || providerLoading !== null}>
-              {loading
-                ? emailOtpSent
-                  ? "Verifying..."
-                  : "Sending OTP..."
-                : emailOtpSent
-                  ? "Verify OTP"
-                  : "Continue with Email"}
-            </button>
-          </form>
-        ) : (
+        {loginType === "mobile" ? (
           <form onSubmit={mobileOtpSent ? handleVerifyMobileOtp : handleSendOtp}>
             <input
               type="tel"
@@ -276,6 +238,44 @@ export default function LoginPageClient({
                 : mobileOtpSent
                   ? "Verify OTP"
                   : "Continue with Mobile"}
+            </button>
+          </form>
+        ) : (
+          <form onSubmit={emailOtpSent ? handleVerifyEmailOtp : handleSendEmailOtp}>
+            <input
+              type="email"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              autoComplete="email"
+              style={input}
+              required
+            />
+
+            {emailOtpSent && (
+              <input
+                placeholder="Enter OTP"
+                value={emailOtp}
+                onChange={(event) => setEmailOtp(event.target.value)}
+                style={input}
+                required
+              />
+            )}
+
+            <p style={helperText}>
+              {emailOtpSent
+                ? "Enter the OTP sent to your email."
+                : "We will send a one-time OTP to your email."}
+            </p>
+
+            <button style={loginBtn} disabled={loading || providerLoading !== null}>
+              {loading
+                ? emailOtpSent
+                  ? "Verifying..."
+                  : "Sending OTP..."
+                : emailOtpSent
+                  ? "Verify OTP"
+                  : "Continue with Email"}
             </button>
           </form>
         )}
