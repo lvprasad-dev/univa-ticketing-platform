@@ -346,32 +346,30 @@ const dividerTextStyle = {
 const tabs = {
   display: "flex",
   marginBottom: "15px",
-  borderRadius: "12px",
-  overflow: "hidden" as const,
+  borderRadius: "18px",
   background: "#f3efff",
-  padding: "4px",
+  padding: "6px",
   gap: "4px",
 }
 
 const activeTab = {
   flex: 1,
-  padding: "10px",
+  padding: "14px 10px",
   border: "none",
-  borderRadius: "10px",
-  background: "#eef0ff",
-  color: "#5a4bff",
+  borderRadius: "14px",
+  background: "linear-gradient(90deg, #5a4bff, #6558ff)",
+  color: "white",
   cursor: "pointer",
-  boxShadow: "inset 0 -4px 0 #ff7a00",
   fontWeight: "700",
 }
 
 const normalTab = {
   flex: 1,
-  padding: "10px",
+  padding: "14px 10px",
   border: "none",
-  borderRadius: "10px",
+  borderRadius: "14px",
   background: "transparent",
-  color: "#5a4bff",
+  color: "#4f4670",
   cursor: "pointer",
   fontWeight: "600",
 }
