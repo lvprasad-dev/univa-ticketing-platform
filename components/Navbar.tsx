@@ -41,6 +41,7 @@ const selectedLocationKey = "univa-selected-location"
 const selectedLocationEvent = "univa-location-change"
 const hasLoggedInBeforeKey = "univa-has-logged-in-before"
 const loginHandledKey = "univa-login-handled"
+const seededNotificationsKey = "univa-seeded-notifications"
 const ticketingLinks = [
   { href: "/movies", label: "Movies" },
   { href: "/travel", label: "Travel" },
@@ -213,6 +214,20 @@ export default function Navbar() {
       setShowSidebar(true)
     }
   }, [isSimpleNavbarPage])
+
+  useEffect(() => {
+    if (window.sessionStorage.getItem(seededNotificationsKey) === "true") {
+      return
+    }
+
+    setNotifications([
+      { id: "seed-1", message: "Welcome to UNIVA. Your account is ready to explore events." },
+      { id: "seed-2", message: "New movies and travel updates are waiting for you." },
+      { id: "seed-3", message: "Create Event tools are available whenever you are ready." },
+      { id: "seed-4", message: "Check notifications often to stay updated with new activity." },
+    ])
+    window.sessionStorage.setItem(seededNotificationsKey, "true")
+  }, [])
 
   useEffect(() => {
     const savedProfilePhoto = window.localStorage.getItem(profilePhotoKey)
