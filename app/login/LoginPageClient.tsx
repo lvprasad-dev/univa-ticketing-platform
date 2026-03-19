@@ -11,7 +11,7 @@ type LoginPageClientProps = {
 export default function LoginPageClient({
   authMessage,
 }: LoginPageClientProps) {
-  const [loginType, setLoginType] = useState<"email" | "mobile">("mobile")
+  const [loginType, setLoginType] = useState<"mobile" | "email">("mobile")
   const [email, setEmail] = useState("")
   const [emailOtp, setEmailOtp] = useState("")
   const [emailOtpSent, setEmailOtpSent] = useState(false)
@@ -74,7 +74,7 @@ export default function LoginPageClient({
     router.push("/")
   }
 
-  const handleSendOtp = async (event: FormEvent<HTMLFormElement>) => {
+  const handleSendMobileOtp = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setError("")
     setMessage("")
@@ -203,7 +203,7 @@ export default function LoginPageClient({
         </div>
 
         {loginType === "mobile" ? (
-          <form onSubmit={mobileOtpSent ? handleVerifyMobileOtp : handleSendOtp}>
+          <form onSubmit={mobileOtpSent ? handleVerifyMobileOtp : handleSendMobileOtp}>
             <input
               type="tel"
               placeholder="Enter mobile number"
@@ -382,21 +382,16 @@ const input = {
   border: "1px solid #d2cce3",
 }
 
-const loginBtn = {
+const orangeSubmitBtn = {
   width: "100%",
   padding: "12px",
   marginTop: "10px",
   border: "none",
   borderRadius: "10px",
-  background: "#5a4bff",
+  background: "#ff7a00",
   color: "white",
   fontWeight: "bold",
   cursor: "pointer",
-}
-
-const orangeSubmitBtn = {
-  ...loginBtn,
-  background: "#ff7a00",
 }
 
 const helperText = {
