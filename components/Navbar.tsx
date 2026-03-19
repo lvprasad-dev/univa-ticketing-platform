@@ -2,7 +2,7 @@
 import { AuthChangeEvent, Session } from "@supabase/supabase-js"
 import Link from "next/link"
 import Image from "next/image"
-import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react"
+import { ChangeEvent, FormEvent, useCallback, useEffect, useRef, useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import { supabase } from "@/lib/supabaseClient"
 
@@ -133,6 +133,7 @@ export default function Navbar() {
   const [profileEmail, setProfileEmail] = useState("")
   const [profilePhoto, setProfilePhoto] = useState("")
   const [showEditPicAction, setShowEditPicAction] = useState(false)
+  const [searchQuery, setSearchQuery] = useState("")
   const fileInputRef = useRef<HTMLInputElement | null>(null)
 
   const navLinks = [
@@ -294,6 +295,47 @@ export default function Navbar() {
     await supabase.auth.signOut()
     setShowSidebar(false)
     router.push("/")
+  }
+
+  const handleSearch = (event?: FormEvent<HTMLFormElement>) => {
+    event?.preventDefault()
+
+    const normalizedQuery = searchQuery.trim().toLowerCase()
+
+    if (!normalizedQuery) {
+      return
+    }
+
+    const routeMap = [
+      { keywords: ["home"], href: "/" },
+      { keywords: ["movie", "movies", "cinema"], href: "/movies" },
+      { keywords: ["travel", "trip", "tour"], href: "/travel" },
+      { keywords: ["darshan", "temple", "devotional"], href: "/darshan" },
+      { keywords: ["conference", "conferences", "seminar"], href: "/conferences" },
+      { keywords: ["festival", "festivals", "event"], href: "/festivals" },
+      { keywords: ["create", "create event", "organizer"], href: "/organizer/create-event" },
+      { keywords: ["my events", "events"], href: "/my-events" },
+      { keywords: ["search"], href: "/search" },
+    ]
+
+    const matchedRoute = routeMap.find((route) =>
+      route.keywords.some(
+        (keyword) =>
+          normalizedQuery === keyword ||
+          normalizedQuery.includes(keyword) ||
+          keyword.includes(normalizedQuery)
+      )
+    )
+
+    const targetRoute = matchedRoute?.href || "/search"
+
+    if (targetRoute === pathname) {
+      router.refresh()
+      return
+    }
+
+    router.push(targetRoute)
+    setSearchQuery("")
   }
 
   return (
@@ -464,9 +506,13 @@ export default function Navbar() {
 
         {!isSimpleNavbarPage && (
           <>
-            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <form
+              onSubmit={handleSearch}
+              style={{ display: "flex", alignItems: "center", gap: "10px" }}
+            >
               <div style={{ position: "relative" }}>
                 <button
+                  type="button"
                   onClick={() => setShowCities(!showCities)}
                   style={{
                     padding: "8px 12px",
@@ -512,6 +558,8 @@ export default function Navbar() {
               <input
                 type="text"
                 placeholder="Search events..."
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
                 style={{
                   padding: "8px 10px",
                   width: "220px",
@@ -521,6 +569,7 @@ export default function Navbar() {
               />
 
               <button
+                type="submit"
                 style={{
                   background: "#ff7a00",
                   color: "white",
@@ -532,7 +581,7 @@ export default function Navbar() {
               >
                 Search
               </button>
-            </div>
+            </form>
 
             <div style={{ display: "flex", alignItems: "center", gap: "40px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "28px" }}>
