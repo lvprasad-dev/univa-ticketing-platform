@@ -43,6 +43,7 @@ const hasLoggedInBeforeKey = "univa-has-logged-in-before"
 const loginHandledKey = "univa-login-handled"
 const seededNotificationsKey = "univa-seeded-notifications-v2"
 const notificationsStorageKey = "univa-navbar-notifications"
+const notificationsClearedEvent = "univa-notifications-cleared"
 const ticketingLinks = [
   { href: "/movies", label: "Movies" },
   { href: "/travel", label: "Travel" },
@@ -254,6 +255,18 @@ export default function Navbar() {
       JSON.stringify(notifications)
     )
   }, [notifications])
+
+  useEffect(() => {
+    const handleNotificationsCleared = () => {
+      setNotifications([])
+    }
+
+    window.addEventListener(notificationsClearedEvent, handleNotificationsCleared)
+
+    return () => {
+      window.removeEventListener(notificationsClearedEvent, handleNotificationsCleared)
+    }
+  }, [])
 
   useEffect(() => {
     const savedProfilePhoto = window.localStorage.getItem(profilePhotoKey)
@@ -683,11 +696,7 @@ export default function Navbar() {
 
                 <button
                   type="button"
-                    onClick={() => {
-                      setNotifications([])
-                      window.localStorage.setItem(notificationsStorageKey, "[]")
-                      router.push("/notifications")
-                    }}
+                  onClick={() => router.push("/notifications")}
                   style={notificationButtonStyle}
                 >
                   <span style={notificationIconStyle}>{"\u{1F514}"}</span>
