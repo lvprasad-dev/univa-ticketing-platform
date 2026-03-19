@@ -642,10 +642,13 @@ export default function Navbar() {
 
                 <button
                   type="button"
-                  onClick={() => router.push("/notifications")}
+                  onClick={() => {
+                    setNotifications([])
+                    router.push("/notifications")
+                  }}
                   style={notificationButtonStyle}
                 >
-                  <span style={notificationIconStyle}>🔔</span>
+                  <span style={notificationIconStyle}>{"\u{1F514}"}</span>
                   {notifications.length > 0 && (
                     <span style={notificationBadgeStyle}>{notifications.length}</span>
                   )}
