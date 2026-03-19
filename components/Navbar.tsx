@@ -336,6 +336,12 @@ export default function Navbar() {
 
     router.push(targetRoute)
     setSearchQuery("")
+
+    window.setTimeout(() => {
+      if (window.location.pathname !== targetRoute) {
+        window.location.href = targetRoute
+      }
+    }, 150)
   }
 
   return (
