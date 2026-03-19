@@ -645,7 +645,7 @@ export default function Navbar() {
                   onClick={() => router.push("/notifications")}
                   style={notificationButtonStyle}
                 >
-                  Bell
+                  <span style={notificationIconStyle}>🔔</span>
                   {notifications.length > 0 && (
                     <span style={notificationBadgeStyle}>{notifications.length}</span>
                   )}
@@ -839,15 +839,18 @@ const notificationButtonStyle = {
   position: "relative" as const,
   border: "none",
   background: "white",
-  minWidth: "54px",
+  width: "34px",
   height: "34px",
-  padding: "0 10px",
+  padding: 0,
   borderRadius: "999px",
   cursor: "pointer",
   boxShadow: "0 6px 14px rgba(80,52,145,0.1)",
-  fontSize: "13px",
-  fontWeight: "700",
   color: "#3a2e67",
+}
+
+const notificationIconStyle = {
+  fontSize: "18px",
+  lineHeight: 1,
 }
 
 const notificationBadgeStyle = {
