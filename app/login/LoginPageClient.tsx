@@ -230,7 +230,7 @@ export default function LoginPageClient({
                 : "We will send a one-time OTP to your mobile number."}
             </p>
 
-            <button style={mobileLoginBtn} disabled={loading || providerLoading !== null}>
+            <button style={orangeSubmitBtn} disabled={loading || providerLoading !== null}>
               {loading
                 ? mobileOtpSent
                   ? "Verifying..."
@@ -268,7 +268,7 @@ export default function LoginPageClient({
                 : "We will send a one-time OTP to your email."}
             </p>
 
-            <button style={mobileLoginBtn} disabled={loading || providerLoading !== null}>
+            <button style={orangeSubmitBtn} disabled={loading || providerLoading !== null}>
               {loading
                 ? emailOtpSent
                   ? "Verifying..."
@@ -394,7 +394,7 @@ const loginBtn = {
   cursor: "pointer",
 }
 
-const mobileLoginBtn = {
+const orangeSubmitBtn = {
   ...loginBtn,
   background: "#ff7a00",
 }
