@@ -1,4 +1,33 @@
+"use client"
+
+import { useState } from "react"
+
+type NotificationItem = {
+  id: string
+  message: string
+}
+
+const notificationsStorageKey = "univa-navbar-notifications"
+
 export default function NotificationsPage() {
+  const [notifications] = useState<NotificationItem[]>(() => {
+    if (typeof window === "undefined") {
+      return []
+    }
+
+    const storedNotifications = window.localStorage.getItem(notificationsStorageKey)
+
+    if (!storedNotifications) {
+      return []
+    }
+
+    try {
+      return JSON.parse(storedNotifications) as NotificationItem[]
+    } catch {
+      return []
+    }
+  })
+
   return (
     <main
       style={{
@@ -44,7 +73,7 @@ export default function NotificationsPage() {
         </h1>
         <p
           style={{
-            margin: 0,
+            margin: "0 0 22px",
             color: "#5b5476",
             fontSize: "16px",
             lineHeight: 1.7,
@@ -55,6 +84,38 @@ export default function NotificationsPage() {
           activity that helps you move faster, discover more, and enjoy a
           smoother UNIVA experience every time you return.
         </p>
+
+        <div style={{ display: "grid", gap: "12px" }}>
+          {notifications.length > 0 ? (
+            notifications.map((notification) => (
+              <div
+                key={notification.id}
+                style={{
+                  padding: "14px 16px",
+                  borderRadius: "16px",
+                  background: "#f8f5ff",
+                  border: "1px solid #ece7fb",
+                  color: "#2c2447",
+                  lineHeight: 1.6,
+                }}
+              >
+                {notification.message}
+              </div>
+            ))
+          ) : (
+            <div
+              style={{
+                padding: "14px 16px",
+                borderRadius: "16px",
+                background: "#f8f5ff",
+                border: "1px solid #ece7fb",
+                color: "#6a6482",
+              }}
+            >
+              No notifications right now.
+            </div>
+          )}
+        </div>
       </section>
     </main>
   )
