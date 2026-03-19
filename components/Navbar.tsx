@@ -41,7 +41,8 @@ const selectedLocationKey = "univa-selected-location"
 const selectedLocationEvent = "univa-location-change"
 const hasLoggedInBeforeKey = "univa-has-logged-in-before"
 const loginHandledKey = "univa-login-handled"
-const seededNotificationsKey = "univa-seeded-notifications"
+const seededNotificationsKey = "univa-seeded-notifications-v2"
+const notificationsStorageKey = "univa-navbar-notifications"
 const ticketingLinks = [
   { href: "/movies", label: "Movies" },
   { href: "/travel", label: "Travel" },
@@ -216,18 +217,43 @@ export default function Navbar() {
   }, [isSimpleNavbarPage])
 
   useEffect(() => {
+    const storedNotifications = window.localStorage.getItem(notificationsStorageKey)
+
+    if (storedNotifications) {
+      try {
+        const parsedNotifications = JSON.parse(storedNotifications) as NavbarNotification[]
+        setNotifications(parsedNotifications)
+        return
+      } catch {
+        window.localStorage.removeItem(notificationsStorageKey)
+      }
+    }
+
     if (window.sessionStorage.getItem(seededNotificationsKey) === "true") {
       return
     }
 
-    setNotifications([
+    const seededNotifications = [
       { id: "seed-1", message: "Welcome to UNIVA. Your account is ready to explore events." },
       { id: "seed-2", message: "New movies and travel updates are waiting for you." },
       { id: "seed-3", message: "Create Event tools are available whenever you are ready." },
       { id: "seed-4", message: "Check notifications often to stay updated with new activity." },
-    ])
+    ]
+
+    setNotifications(seededNotifications)
+    window.localStorage.setItem(
+      notificationsStorageKey,
+      JSON.stringify(seededNotifications)
+    )
     window.sessionStorage.setItem(seededNotificationsKey, "true")
   }, [])
+
+  useEffect(() => {
+    window.localStorage.setItem(
+      notificationsStorageKey,
+      JSON.stringify(notifications)
+    )
+  }, [notifications])
 
   useEffect(() => {
     const savedProfilePhoto = window.localStorage.getItem(profilePhotoKey)
@@ -657,10 +683,11 @@ export default function Navbar() {
 
                 <button
                   type="button"
-                  onClick={() => {
-                    setNotifications([])
-                    router.push("/notifications")
-                  }}
+                    onClick={() => {
+                      setNotifications([])
+                      window.localStorage.setItem(notificationsStorageKey, "[]")
+                      router.push("/notifications")
+                    }}
                   style={notificationButtonStyle}
                 >
                   <span style={notificationIconStyle}>{"\u{1F514}"}</span>
