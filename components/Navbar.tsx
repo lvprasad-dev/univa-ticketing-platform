@@ -1,4 +1,5 @@
 "use client"
+
 import { AuthChangeEvent, Session } from "@supabase/supabase-js"
 import Link from "next/link"
 import Image from "next/image"
@@ -20,6 +21,11 @@ type LocationAddress = Partial<
   >
 >
 
+type NavbarNotification = {
+  id: string
+  message: string
+}
+
 const cities = [
   { name: "Guntur", lat: 16.3067, lon: 80.4365 },
   { name: "Vijayawada", lat: 16.5062, lon: 80.648 },
@@ -33,6 +39,8 @@ const profilePhotoKey = "univa-profile-photo"
 const sidebarOpenKey = "univa-sidebar-open"
 const selectedLocationKey = "univa-selected-location"
 const selectedLocationEvent = "univa-location-change"
+const hasLoggedInBeforeKey = "univa-has-logged-in-before"
+const loginHandledKey = "univa-login-handled"
 const ticketingLinks = [
   { href: "/movies", label: "Movies" },
   { href: "/travel", label: "Travel" },
@@ -134,6 +142,7 @@ export default function Navbar() {
   const [profilePhoto, setProfilePhoto] = useState("")
   const [showEditPicAction, setShowEditPicAction] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
+  const [notifications, setNotifications] = useState<NavbarNotification[]>([])
   const fileInputRef = useRef<HTMLInputElement | null>(null)
 
   const navLinks = [
@@ -227,6 +236,10 @@ export default function Navbar() {
         setIsLoggedIn(Boolean(session))
         setProfileName(resolvedName)
         setProfileEmail(session?.user.email || "")
+
+        if (!session) {
+          window.sessionStorage.removeItem(loginHandledKey)
+        }
       }
     }
 
@@ -235,7 +248,7 @@ export default function Navbar() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(
-      (_event: AuthChangeEvent, session: Session | null) => {
+      (event: AuthChangeEvent, session: Session | null) => {
         const resolvedName =
           session?.user.user_metadata?.full_name ||
           session?.user.email?.split("@")[0] ||
@@ -243,6 +256,31 @@ export default function Navbar() {
         setIsLoggedIn(Boolean(session))
         setProfileName(resolvedName)
         setProfileEmail(session?.user.email || "")
+
+        if (event === "SIGNED_IN" && session) {
+          const hasLoggedInBefore =
+            window.localStorage.getItem(hasLoggedInBeforeKey) === "true"
+          const alreadyHandledInSession =
+            window.sessionStorage.getItem(loginHandledKey) === "true"
+
+          if (!alreadyHandledInSession) {
+            setNotifications((current) => [
+              {
+                id: `${Date.now()}`,
+                message: hasLoggedInBefore
+                  ? `Welcome back, ${resolvedName}!`
+                  : `Welcome to UNIVA, ${resolvedName}!`,
+              },
+              ...current,
+            ])
+            window.localStorage.setItem(hasLoggedInBeforeKey, "true")
+            window.sessionStorage.setItem(loginHandledKey, "true")
+          }
+        }
+
+        if (event === "SIGNED_OUT") {
+          window.sessionStorage.removeItem(loginHandledKey)
+        }
       }
     )
 
@@ -292,6 +330,7 @@ export default function Navbar() {
 
   const handleLogout = async () => {
     window.sessionStorage.removeItem(sidebarOpenKey)
+    window.sessionStorage.removeItem(loginHandledKey)
     await supabase.auth.signOut()
     setShowSidebar(false)
     router.push("/")
@@ -601,8 +640,15 @@ export default function Navbar() {
                   </Link>
                 ))}
 
-                <button type="button" style={notificationButtonStyle}>
-                  🔔
+                <button
+                  type="button"
+                  onClick={() => router.push("/notifications")}
+                  style={notificationButtonStyle}
+                >
+                  Bell
+                  {notifications.length > 0 && (
+                    <span style={notificationBadgeStyle}>{notifications.length}</span>
+                  )}
                 </button>
               </div>
 
@@ -790,14 +836,35 @@ const sidebarActiveLink = {
 }
 
 const notificationButtonStyle = {
+  position: "relative" as const,
   border: "none",
   background: "white",
-  width: "34px",
+  minWidth: "54px",
   height: "34px",
+  padding: "0 10px",
   borderRadius: "999px",
   cursor: "pointer",
   boxShadow: "0 6px 14px rgba(80,52,145,0.1)",
-  fontSize: "18px",
+  fontSize: "13px",
+  fontWeight: "700",
+  color: "#3a2e67",
+}
+
+const notificationBadgeStyle = {
+  position: "absolute" as const,
+  top: "-4px",
+  right: "-4px",
+  minWidth: "18px",
+  height: "18px",
+  padding: "0 5px",
+  borderRadius: "999px",
+  background: "#e53935",
+  color: "white",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  fontSize: "11px",
+  fontWeight: "700",
 }
 
 const sidebarLogoutButtonStyle = {
