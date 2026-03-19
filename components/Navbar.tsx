@@ -41,7 +41,7 @@ const selectedLocationKey = "univa-selected-location"
 const selectedLocationEvent = "univa-location-change"
 const hasLoggedInBeforeKey = "univa-has-logged-in-before"
 const loginHandledKey = "univa-login-handled"
-const seededNotificationsKey = "univa-seeded-notifications-v2"
+const seededNotificationsKey = "univa-seeded-notifications-v3"
 const notificationsStorageKey = "univa-navbar-notifications"
 const notificationsClearedEvent = "univa-notifications-cleared"
 const ticketingLinks = [
@@ -223,8 +223,10 @@ export default function Navbar() {
     if (storedNotifications) {
       try {
         const parsedNotifications = JSON.parse(storedNotifications) as NavbarNotification[]
-        setNotifications(parsedNotifications)
-        return
+        if (parsedNotifications.length > 0) {
+          setNotifications(parsedNotifications)
+          return
+        }
       } catch {
         window.localStorage.removeItem(notificationsStorageKey)
       }
