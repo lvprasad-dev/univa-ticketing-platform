@@ -240,8 +240,7 @@ export default function Home() {
 const pageStyle = {
   marginTop: "55px",
   minHeight: "100vh",
-  background:
-    "radial-gradient(circle at top, rgba(255,184,77,0.18), transparent 24%), radial-gradient(circle at left 20%, rgba(77,170,255,0.14), transparent 26%), linear-gradient(180deg, #ffffff 0%, #f9fbff 48%, #fffaf4 100%)",
+  background: "#ffffff",
 }
 
 const topBackgroundSectionStyle = {
@@ -256,11 +255,12 @@ const topBackgroundSectionStyle = {
 
 const lowerBackgroundSectionStyle = {
   backgroundImage: "url('/web-home2.png')",
-  backgroundSize: "cover",
+  backgroundSize: "100% auto",
   backgroundPosition: "center top",
   backgroundRepeat: "no-repeat",
-  marginTop: "18px",
-  paddingTop: "72px",
+  marginTop: "0",
+  paddingTop: "48px",
+  minHeight: "1200px",
 }
 
 const ticketingStripStyle = {
