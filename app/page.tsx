@@ -253,8 +253,11 @@ const topBackgroundSectionStyle = {
 }
 
 const lowerBackgroundSectionStyle = {
-  background:
-    "radial-gradient(circle at 10% 86%, rgba(87,166,255,0.14), transparent 22%), radial-gradient(circle at 90% 84%, rgba(255,153,77,0.14), transparent 22%), linear-gradient(180deg, #ffffff 0%, #fbfcff 52%, #fff8f1 100%)",
+  backgroundImage:
+    "linear-gradient(180deg, rgba(255,255,255,0.72), rgba(255,255,255,0.78)), url('/web-home2.png')",
+  backgroundSize: "cover",
+  backgroundPosition: "center",
+  backgroundRepeat: "no-repeat",
   marginTop: "18px",
   paddingTop: "72px",
   borderTopLeftRadius: "36px",
