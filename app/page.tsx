@@ -256,13 +256,13 @@ const topBackgroundSectionStyle = {
 }
 
 const lowerBackgroundSectionStyle = {
-  backgroundImage:
-    "linear-gradient(180deg, rgba(255,255,255,0.72), rgba(255,255,255,0.78)), url('/web-home2.png')",
+  backgroundImage: "url('/web-home2.png')",
   backgroundSize: "cover",
-  backgroundPosition: "center",
+  backgroundPosition: "center top",
   backgroundRepeat: "no-repeat",
   marginTop: "18px",
   paddingTop: "72px",
+  backgroundColor: "#fffaf5",
   borderTopLeftRadius: "36px",
   borderTopRightRadius: "36px",
   boxShadow: "0 -14px 34px rgba(37, 25, 77, 0.08)",
