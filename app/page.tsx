@@ -17,7 +17,7 @@ export default function Home() {
 
   const handleRoleSelect = (role: "buyer" | "seller") => {
     window.localStorage.setItem(userRoleKey, role)
-    router.push(role === "buyer" ? "/" : "/organizer/create-event")
+    router.push(role === "buyer" ? "/movies" : "/organizer/create-event")
   }
 
   return (
