@@ -80,6 +80,9 @@ export default function Home() {
         </div>
       </section>
 
+      </section>
+
+      <section style={lowerBackgroundSectionStyle}>
       <section style={contentSectionStyle}>
         <div style={contentGridStyle}>
           <div style={contentCardStyle}>
@@ -127,10 +130,6 @@ export default function Home() {
           </p>
         </div>
       </section>
-
-      </section>
-
-      <section style={lowerBackgroundSectionStyle}>
       <section style={featuresSectionStyle}>
         <h2 style={featuresHeadingStyle}>Everything You Need in One Place</h2>
 
@@ -248,7 +247,7 @@ const topBackgroundSectionStyle = {
   backgroundSize: "cover",
   backgroundPosition: "center top",
   backgroundRepeat: "no-repeat",
-  paddingBottom: "56px",
+  paddingBottom: "88px",
 }
 
 const lowerBackgroundSectionStyle = {
@@ -256,7 +255,12 @@ const lowerBackgroundSectionStyle = {
   backgroundSize: "cover",
   backgroundPosition: "center",
   backgroundRepeat: "no-repeat",
-  paddingTop: "36px",
+  marginTop: "18px",
+  paddingTop: "72px",
+  borderTopLeftRadius: "36px",
+  borderTopRightRadius: "36px",
+  boxShadow: "0 -14px 34px rgba(37, 25, 77, 0.08)",
+  overflow: "hidden" as const,
 }
 
 const ticketingStripStyle = {
