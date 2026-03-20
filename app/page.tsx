@@ -172,6 +172,62 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <section style={bottomSectionStyle}>
+        <div style={bottomHeroStyle}>
+          <div>
+            <p style={bottomEyebrowStyle}>Ready To Book Or Host</p>
+            <h2 style={bottomTitleStyle}>One platform for every ticketing moment.</h2>
+            <p style={bottomTextStyle}>
+              Explore events, reserve tickets, or launch your own event experience
+              with a flow that feels simple, clear, and reliable.
+            </p>
+          </div>
+
+          <div style={bottomActionsStyle}>
+            <Link href="/movies" style={bottomPrimaryLinkStyle}>
+              Explore Tickets
+            </Link>
+            <Link href="/organizer/create-event" style={bottomSecondaryLinkStyle}>
+              Start Creating
+            </Link>
+          </div>
+        </div>
+
+        <div style={bottomInfoGridStyle}>
+          <div style={bottomInfoCardStyle}>
+            <h3 style={bottomCardTitleStyle}>For Attendees</h3>
+            <p style={bottomCardTextStyle}>
+              Browse trusted listings, pick the right category, and keep your
+              bookings organized in one place.
+            </p>
+          </div>
+
+          <div style={bottomInfoCardStyle}>
+            <h3 style={bottomCardTitleStyle}>For Organizers</h3>
+            <p style={bottomCardTextStyle}>
+              Create events, manage visibility, and track activity with a simple
+              event-first workflow.
+            </p>
+          </div>
+
+          <div style={bottomInfoCardStyle}>
+            <h3 style={bottomCardTitleStyle}>Support</h3>
+            <p style={bottomCardTextStyle}>
+              UNIVA keeps discovery, booking, and event management connected so
+              users do not need to jump between multiple tools.
+            </p>
+          </div>
+        </div>
+
+        <footer style={footerStyle}>
+          <p style={footerBrandStyle}>UNIVA Ticketing Platform</p>
+          <p style={footerTextStyle}>
+            Built for smoother bookings, better event discovery, and easier event
+            management.
+          </p>
+        </footer>
+      </section>
     </main>
   )
 }
@@ -373,6 +429,122 @@ const trustTextStyle = {
 
 const featuresSectionStyle = {
   padding: "0 32px 72px",
+}
+
+const bottomSectionStyle = {
+  maxWidth: "1180px",
+  margin: "0 auto",
+  padding: "0 32px 72px",
+  display: "grid",
+  gap: "22px",
+}
+
+const bottomHeroStyle = {
+  display: "grid",
+  gridTemplateColumns: "1.5fr 1fr",
+  gap: "20px",
+  alignItems: "center",
+  padding: "28px",
+  borderRadius: "28px",
+  background: "linear-gradient(135deg, rgba(255,255,255,0.96), rgba(255,244,235,0.96))",
+  boxShadow: "0 18px 36px rgba(37, 25, 77, 0.1)",
+}
+
+const bottomEyebrowStyle = {
+  margin: "0 0 10px",
+  color: "#ff7a00",
+  fontSize: "12px",
+  fontWeight: "700",
+  textTransform: "uppercase" as const,
+  letterSpacing: "1px",
+}
+
+const bottomTitleStyle = {
+  margin: "0 0 12px",
+  color: "#16112a",
+  fontSize: "32px",
+  lineHeight: 1.2,
+}
+
+const bottomTextStyle = {
+  margin: 0,
+  color: "#4b4468",
+  fontSize: "16px",
+  lineHeight: 1.7,
+  maxWidth: "640px",
+}
+
+const bottomActionsStyle = {
+  display: "grid",
+  gap: "12px",
+  justifyItems: "stretch",
+}
+
+const bottomPrimaryLinkStyle = {
+  textDecoration: "none",
+  textAlign: "center" as const,
+  padding: "14px 18px",
+  borderRadius: "14px",
+  background: "#ff7a00",
+  color: "white",
+  fontWeight: "700",
+  boxShadow: "0 14px 28px rgba(255,122,0,0.18)",
+}
+
+const bottomSecondaryLinkStyle = {
+  textDecoration: "none",
+  textAlign: "center" as const,
+  padding: "14px 18px",
+  borderRadius: "14px",
+  background: "white",
+  color: "#2d2348",
+  border: "1px solid #eadfd8",
+  fontWeight: "700",
+}
+
+const bottomInfoGridStyle = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+  gap: "18px",
+}
+
+const bottomInfoCardStyle = {
+  padding: "22px",
+  borderRadius: "22px",
+  background: "rgba(255,255,255,0.95)",
+  boxShadow: "0 14px 30px rgba(37, 25, 77, 0.08)",
+}
+
+const bottomCardTitleStyle = {
+  margin: "0 0 10px",
+  color: "#16112a",
+  fontSize: "20px",
+}
+
+const bottomCardTextStyle = {
+  margin: 0,
+  color: "#5d6475",
+  lineHeight: 1.6,
+}
+
+const footerStyle = {
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  gap: "16px",
+  flexWrap: "wrap" as const,
+  padding: "20px 4px 0",
+}
+
+const footerBrandStyle = {
+  margin: 0,
+  color: "#16112a",
+  fontWeight: "700",
+}
+
+const footerTextStyle = {
+  margin: 0,
+  color: "#6b657f",
 }
 
 const featuresHeadingStyle = {
