@@ -80,9 +80,6 @@ export default function Home() {
         </div>
       </section>
 
-      </section>
-
-      <section style={lowerBackgroundSectionStyle}>
       <section style={contentSectionStyle}>
         <div style={contentGridStyle}>
           <div style={contentCardStyle}>
@@ -130,6 +127,10 @@ export default function Home() {
           </p>
         </div>
       </section>
+
+      </section>
+
+      <section style={lowerBackgroundSectionStyle}>
       <section style={featuresSectionStyle}>
         <h2 style={featuresHeadingStyle}>Everything You Need in One Place</h2>
 
