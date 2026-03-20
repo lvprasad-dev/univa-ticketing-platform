@@ -240,22 +240,21 @@ export default function Home() {
 const pageStyle = {
   marginTop: "55px",
   minHeight: "100vh",
-  background: "#fffaf5",
+  background:
+    "radial-gradient(circle at top, rgba(255,184,77,0.18), transparent 24%), radial-gradient(circle at left 20%, rgba(77,170,255,0.14), transparent 26%), linear-gradient(180deg, #ffffff 0%, #f9fbff 48%, #fffaf4 100%)",
 }
 
 const topBackgroundSectionStyle = {
-  backgroundImage: "url('/univa-home.png')",
-  backgroundSize: "cover",
-  backgroundPosition: "center top",
-  backgroundRepeat: "no-repeat",
+  background:
+    "radial-gradient(circle at 12% 52%, rgba(77,170,255,0.22), transparent 18%), radial-gradient(circle at 88% 40%, rgba(255,171,67,0.22), transparent 18%), radial-gradient(circle at 50% 24%, rgba(99,108,255,0.08), transparent 22%), linear-gradient(180deg, #ffffff 0%, #fbfdff 54%, rgba(255,250,244,0.9) 100%)",
   paddingBottom: "88px",
+  position: "relative" as const,
+  overflow: "hidden" as const,
 }
 
 const lowerBackgroundSectionStyle = {
-  backgroundImage: "url('/web-home2.png')",
-  backgroundSize: "cover",
-  backgroundPosition: "center",
-  backgroundRepeat: "no-repeat",
+  background:
+    "radial-gradient(circle at 10% 86%, rgba(87,166,255,0.14), transparent 22%), radial-gradient(circle at 90% 84%, rgba(255,153,77,0.14), transparent 22%), linear-gradient(180deg, #ffffff 0%, #fbfcff 52%, #fff8f1 100%)",
   marginTop: "18px",
   paddingTop: "72px",
   borderTopLeftRadius: "36px",
@@ -339,8 +338,9 @@ const roleCardStyle = {
   textAlign: "center" as const,
   padding: "28px 24px",
   borderRadius: "28px",
-  background: "white",
-  boxShadow: "0 18px 40px rgba(37, 25, 77, 0.12)",
+  background: "rgba(255,255,255,0.94)",
+  boxShadow: "0 18px 40px rgba(37, 25, 77, 0.1)",
+  backdropFilter: "blur(8px)",
 }
 
 const roleTitleStyle = {
@@ -389,8 +389,9 @@ const contentGridStyle = {
 const contentCardStyle = {
   padding: "22px",
   borderRadius: "24px",
-  background: "rgba(255,255,255,0.92)",
-  boxShadow: "0 16px 34px rgba(37, 25, 77, 0.1)",
+  background: "rgba(255,255,255,0.9)",
+  boxShadow: "0 16px 34px rgba(37, 25, 77, 0.08)",
+  backdropFilter: "blur(8px)",
 }
 
 const contentEyebrowStyle = {
@@ -432,8 +433,9 @@ const contentIconStyle = {
 const trustPanelStyle = {
   padding: "26px",
   borderRadius: "26px",
-  background: "linear-gradient(135deg, rgba(255,255,255,0.94), rgba(245,240,255,0.94))",
-  boxShadow: "0 16px 34px rgba(37, 25, 77, 0.1)",
+  background:
+    "linear-gradient(135deg, rgba(255,255,255,0.96), rgba(245,248,255,0.92), rgba(255,247,239,0.94))",
+  boxShadow: "0 16px 34px rgba(37, 25, 77, 0.08)",
   textAlign: "center" as const,
 }
 
@@ -592,8 +594,9 @@ const featureCardStyle = {
   textAlign: "center" as const,
   padding: "34px 24px",
   borderRadius: "24px",
-  background: "rgba(255,255,255,0.96)",
-  boxShadow: "0 18px 36px rgba(37, 25, 77, 0.1)",
+  background: "rgba(255,255,255,0.94)",
+  boxShadow: "0 18px 36px rgba(37, 25, 77, 0.08)",
+  backdropFilter: "blur(8px)",
 }
 
 const featureIconCircleStyle = {
