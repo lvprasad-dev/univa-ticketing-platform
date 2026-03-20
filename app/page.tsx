@@ -245,8 +245,11 @@ const pageStyle = {
 }
 
 const topBackgroundSectionStyle = {
-  background:
-    "radial-gradient(circle at 12% 52%, rgba(77,170,255,0.22), transparent 18%), radial-gradient(circle at 88% 40%, rgba(255,171,67,0.22), transparent 18%), radial-gradient(circle at 50% 24%, rgba(99,108,255,0.08), transparent 22%), linear-gradient(180deg, #ffffff 0%, #fbfdff 54%, rgba(255,250,244,0.9) 100%)",
+  backgroundImage:
+    "linear-gradient(180deg, rgba(255,255,255,0.2), rgba(255,255,255,0.28)), url('/univa-home.png')",
+  backgroundSize: "cover",
+  backgroundPosition: "center top",
+  backgroundRepeat: "no-repeat",
   paddingBottom: "88px",
   position: "relative" as const,
   overflow: "hidden" as const,
