@@ -22,6 +22,7 @@ export default function Home() {
 
   return (
     <main style={pageStyle}>
+      <section style={topBackgroundSectionStyle}>
       <section style={ticketingStripStyle}>
         <div style={chipsStyle}>
           {categories.map((category) => (
@@ -127,6 +128,9 @@ export default function Home() {
         </div>
       </section>
 
+      </section>
+
+      <section style={lowerBackgroundSectionStyle}>
       <section style={featuresSectionStyle}>
         <h2 style={featuresHeadingStyle}>Everything You Need in One Place</h2>
 
@@ -228,6 +232,7 @@ export default function Home() {
           </p>
         </footer>
       </section>
+      </section>
     </main>
   )
 }
@@ -235,10 +240,23 @@ export default function Home() {
 const pageStyle = {
   marginTop: "55px",
   minHeight: "100vh",
+  background: "#fffaf5",
+}
+
+const topBackgroundSectionStyle = {
   backgroundImage: "url('/univa-home.png')",
+  backgroundSize: "cover",
+  backgroundPosition: "center top",
+  backgroundRepeat: "no-repeat",
+  paddingBottom: "56px",
+}
+
+const lowerBackgroundSectionStyle = {
+  backgroundImage: "url('/web-home2.png')",
   backgroundSize: "cover",
   backgroundPosition: "center",
   backgroundRepeat: "no-repeat",
+  paddingTop: "36px",
 }
 
 const ticketingStripStyle = {
