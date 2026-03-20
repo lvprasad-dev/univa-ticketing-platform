@@ -256,7 +256,7 @@ const topBackgroundSectionStyle = {
 const lowerBackgroundSectionStyle = {
   backgroundImage: "url('/web-home2.png')",
   backgroundSize: "100% auto",
-  backgroundPosition: "center top",
+  backgroundPosition: "center -140px",
   backgroundRepeat: "no-repeat",
   marginTop: "0",
   paddingTop: "0",
