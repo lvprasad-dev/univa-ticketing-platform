@@ -26,6 +26,26 @@ type NavbarNotification = {
   message: string
 }
 
+const getNotificationHeading = (message: string, index: number) => {
+  if (message.toLowerCase().includes("welcome back")) {
+    return "Welcome Back"
+  }
+
+  if (message.toLowerCase().includes("welcome to univa")) {
+    return "Welcome to UNIVA"
+  }
+
+  if (message.toLowerCase().includes("movies") || message.toLowerCase().includes("travel")) {
+    return "Fresh Updates"
+  }
+
+  if (message.toLowerCase().includes("create event")) {
+    return "Creator Tools"
+  }
+
+  return `Notification ${index + 1}`
+}
+
 const cities = [
   { name: "Guntur", lat: 16.3067, lon: 80.4365 },
   { name: "Vijayawada", lat: 16.5062, lon: 80.648 },
@@ -146,6 +166,9 @@ export default function Navbar() {
   const [showEditPicAction, setShowEditPicAction] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [notifications, setNotifications] = useState<NavbarNotification[]>([])
+  const [unreadNotificationCount, setUnreadNotificationCount] = useState(0)
+  const [showNotificationsPanel, setShowNotificationsPanel] = useState(false)
+  const [activeNotificationId, setActiveNotificationId] = useState("")
   const fileInputRef = useRef<HTMLInputElement | null>(null)
 
   const navLinks = [
@@ -225,6 +248,8 @@ export default function Navbar() {
         const parsedNotifications = JSON.parse(storedNotifications) as NavbarNotification[]
         if (parsedNotifications.length > 0) {
           setNotifications(parsedNotifications)
+          setUnreadNotificationCount(parsedNotifications.length)
+          setActiveNotificationId(parsedNotifications[0]?.id || "")
           return
         }
       } catch {
@@ -244,6 +269,8 @@ export default function Navbar() {
     ]
 
     setNotifications(seededNotifications)
+    setUnreadNotificationCount(seededNotifications.length)
+    setActiveNotificationId(seededNotifications[0].id)
     window.localStorage.setItem(
       notificationsStorageKey,
       JSON.stringify(seededNotifications)
@@ -260,7 +287,7 @@ export default function Navbar() {
 
   useEffect(() => {
     const handleNotificationsCleared = () => {
-      setNotifications([])
+      setUnreadNotificationCount(0)
     }
 
     window.addEventListener(notificationsClearedEvent, handleNotificationsCleared)
@@ -320,15 +347,15 @@ export default function Navbar() {
             window.sessionStorage.getItem(loginHandledKey) === "true"
 
           if (!alreadyHandledInSession) {
-            setNotifications((current) => [
-              {
-                id: `${Date.now()}`,
-                message: hasLoggedInBefore
-                  ? `Welcome back, ${resolvedName}!`
-                  : `Welcome to UNIVA, ${resolvedName}!`,
-              },
-              ...current,
-            ])
+            const nextNotification = {
+              id: `${Date.now()}`,
+              message: hasLoggedInBefore
+                ? `Welcome back, ${resolvedName}!`
+                : `Welcome to UNIVA, ${resolvedName}!`,
+            }
+            setNotifications((current) => [nextNotification, ...current])
+            setUnreadNotificationCount((current) => current + 1)
+            setActiveNotificationId(nextNotification.id)
             window.localStorage.setItem(hasLoggedInBeforeKey, "true")
             window.sessionStorage.setItem(loginHandledKey, "true")
           }
@@ -698,12 +725,16 @@ export default function Navbar() {
 
                 <button
                   type="button"
-                  onClick={() => router.push("/notifications")}
+                  onClick={() => {
+                    setShowNotificationsPanel(true)
+                    setUnreadNotificationCount(0)
+                    window.dispatchEvent(new Event(notificationsClearedEvent))
+                  }}
                   style={notificationButtonStyle}
                 >
                   <span style={notificationIconStyle}>{"\u{1F514}"}</span>
-                  {notifications.length > 0 && (
-                    <span style={notificationBadgeStyle}>{notifications.length}</span>
+                  {unreadNotificationCount > 0 && (
+                    <span style={notificationBadgeStyle}>{unreadNotificationCount}</span>
                   )}
                 </button>
               </div>
@@ -719,6 +750,62 @@ export default function Navbar() {
           </>
         )}
       </nav>
+
+      {showNotificationsPanel && !isSimpleNavbarPage && (
+        <aside style={notificationsDrawerStyle}>
+          <div style={notificationsDrawerHeaderStyle}>
+            <div>
+              <p style={notificationsEyebrowStyle}>Notifications</p>
+              <h2 style={notificationsTitleStyle}>Hello user, welcome to UNIVA.</h2>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowNotificationsPanel(false)}
+              style={notificationsCloseStyle}
+            >
+              x
+            </button>
+          </div>
+
+          <p style={notificationsIntroStyle}>
+            Every important update appears here first. Open any notification below
+            to read the full information without leaving your current page.
+          </p>
+
+          <div style={notificationsListStyle}>
+            {notifications.length > 0 ? (
+              notifications.map((notification, index) => {
+                const isActive = notification.id === activeNotificationId
+
+                return (
+                  <button
+                    key={notification.id}
+                    type="button"
+                    onClick={() =>
+                      setActiveNotificationId((current) =>
+                        current === notification.id ? "" : notification.id
+                      )
+                    }
+                    style={{
+                      ...notificationCardStyle,
+                      background: isActive ? "#fff7f0" : "#f8f5ff",
+                    }}
+                  >
+                    <p style={notificationHeadingStyle}>
+                      {getNotificationHeading(notification.message, index)}
+                    </p>
+                    {isActive && (
+                      <p style={notificationMessageStyle}>{notification.message}</p>
+                    )}
+                  </button>
+                )
+              })
+            ) : (
+              <div style={notificationEmptyCardStyle}>No notifications right now.</div>
+            )}
+          </div>
+        </aside>
+      )}
     </>
   )
 }
@@ -924,6 +1011,96 @@ const notificationBadgeStyle = {
   justifyContent: "center",
   fontSize: "11px",
   fontWeight: "700",
+}
+
+const notificationsDrawerStyle = {
+  position: "fixed" as const,
+  top: "72px",
+  right: "24px",
+  width: "min(460px, calc(100vw - 32px))",
+  maxHeight: "calc(100vh - 96px)",
+  overflowY: "auto" as const,
+  padding: "24px",
+  borderRadius: "24px",
+  background: "rgba(255,255,255,0.97)",
+  boxShadow: "-18px 20px 40px rgba(58, 40, 110, 0.14)",
+  border: "1px solid #ece7fb",
+  zIndex: 1200,
+}
+
+const notificationsDrawerHeaderStyle = {
+  display: "flex",
+  alignItems: "flex-start",
+  justifyContent: "space-between",
+  gap: "16px",
+}
+
+const notificationsEyebrowStyle = {
+  margin: "0 0 10px",
+  color: "#ff7a00",
+  fontSize: "14px",
+  fontWeight: "700",
+  letterSpacing: "0.08em",
+  textTransform: "uppercase" as const,
+}
+
+const notificationsTitleStyle = {
+  margin: 0,
+  color: "#221a3c",
+  fontSize: "28px",
+  lineHeight: 1.2,
+}
+
+const notificationsCloseStyle = {
+  border: "none",
+  background: "#f6f1ff",
+  width: "34px",
+  height: "34px",
+  borderRadius: "999px",
+  cursor: "pointer",
+  color: "#241c3e",
+}
+
+const notificationsIntroStyle = {
+  margin: "16px 0 22px",
+  color: "#5b5476",
+  fontSize: "16px",
+  lineHeight: 1.7,
+}
+
+const notificationsListStyle = {
+  display: "grid",
+  gap: "12px",
+}
+
+const notificationCardStyle = {
+  textAlign: "left" as const,
+  border: "1px solid #ece7fb",
+  borderRadius: "18px",
+  padding: "16px 18px",
+  cursor: "pointer",
+}
+
+const notificationHeadingStyle = {
+  margin: 0,
+  color: "#221a3c",
+  fontSize: "16px",
+  fontWeight: "700",
+}
+
+const notificationMessageStyle = {
+  margin: "10px 0 0",
+  color: "#5b5476",
+  fontSize: "15px",
+  lineHeight: 1.7,
+}
+
+const notificationEmptyCardStyle = {
+  padding: "14px 16px",
+  borderRadius: "16px",
+  background: "#f8f5ff",
+  border: "1px solid #ece7fb",
+  color: "#6a6482",
 }
 
 const sidebarLogoutButtonStyle = {
