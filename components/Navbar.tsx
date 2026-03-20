@@ -75,6 +75,7 @@ const headerLinks = [
   { href: "/", label: "Home" },
   { href: "/organizer/create-event", label: "Create Event" },
   { href: "/my-events", label: "My Events" },
+  { href: "/my-tickets", label: "My Tickets" },
 ]
 
 const toRadians = (value: number) => (value * Math.PI) / 180
@@ -176,6 +177,7 @@ export default function Navbar() {
     { href: "/", label: "Home" },
     { href: "/organizer/create-event", label: "Create Event" },
     { href: "/my-events", label: "My Events" },
+    { href: "/my-tickets", label: "My Tickets" },
   ]
 
   const detectLocation = useCallback(() => {
@@ -437,6 +439,7 @@ export default function Navbar() {
       { keywords: ["festival", "festivals", "event"], href: "/festivals" },
       { keywords: ["create", "create event", "organizer"], href: "/organizer/create-event" },
       { keywords: ["my events", "events"], href: "/my-events" },
+      { keywords: ["my tickets", "tickets", "bookings", "booked tickets"], href: "/my-tickets" },
       { keywords: ["search"], href: "/search" },
     ]
 
