@@ -245,8 +245,7 @@ const pageStyle = {
 }
 
 const topBackgroundSectionStyle = {
-  backgroundImage:
-    "linear-gradient(180deg, rgba(255,255,255,0.2), rgba(255,255,255,0.28)), url('/univa-home.png')",
+  backgroundImage: "url('/univa-home.png')",
   backgroundSize: "cover",
   backgroundPosition: "center top",
   backgroundRepeat: "no-repeat",
@@ -262,11 +261,6 @@ const lowerBackgroundSectionStyle = {
   backgroundRepeat: "no-repeat",
   marginTop: "18px",
   paddingTop: "72px",
-  backgroundColor: "#fffaf5",
-  borderTopLeftRadius: "36px",
-  borderTopRightRadius: "36px",
-  boxShadow: "0 -14px 34px rgba(37, 25, 77, 0.08)",
-  overflow: "hidden" as const,
 }
 
 const ticketingStripStyle = {
