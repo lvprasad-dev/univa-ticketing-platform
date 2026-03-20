@@ -714,8 +714,8 @@ export default function Navbar() {
               </button>
             </form>
 
-            <div style={{ display: "flex", alignItems: "center", gap: "40px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "28px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "24px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "18px", flexWrap: "wrap" }}>
                 {headerLinks.map((link) => (
                   <Link
                     key={link.href}
