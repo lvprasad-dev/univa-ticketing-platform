@@ -259,7 +259,7 @@ const lowerBackgroundSectionStyle = {
   backgroundPosition: "center top",
   backgroundRepeat: "no-repeat",
   marginTop: "0",
-  paddingTop: "48px",
+  paddingTop: "0",
   minHeight: "1200px",
 }
 
@@ -453,7 +453,7 @@ const trustTextStyle = {
 }
 
 const featuresSectionStyle = {
-  padding: "0 32px 72px",
+  padding: "40px 32px 72px",
 }
 
 const bottomSectionStyle = {
