@@ -239,7 +239,11 @@ const pageStyle = {
   marginTop: "72px",
   minHeight: "100vh",
   padding: "15px 32px 32px",
-  background: "#fff8f2",
+  backgroundImage:
+    "linear-gradient(rgba(34, 22, 16, 0.2), rgba(34, 22, 16, 0.2)), url('/my-tickets-bg.png')",
+  backgroundSize: "cover",
+  backgroundPosition: "center",
+  backgroundRepeat: "no-repeat",
 }
 
 const tabBarWrapStyle = {
@@ -253,8 +257,8 @@ const tabBarStyle = {
   gap: "10px",
   padding: "8px 10px",
   borderRadius: "18px",
-  background: "white",
-  boxShadow: "0 12px 24px rgba(150,92,52,0.08)",
+  background: "rgba(255,255,255,0.9)",
+  boxShadow: "0 12px 24px rgba(30,18,12,0.12)",
 }
 
 const tabButtonStyle = {
@@ -278,12 +282,12 @@ const headerCardStyle = {
   margin: "0 auto 24px",
   padding: "24px",
   borderRadius: "24px",
-  background: "white",
+  background: "rgba(255,255,255,0.9)",
   display: "flex",
   alignItems: "center",
   justifyContent: "space-between",
   gap: "16px",
-  boxShadow: "0 18px 36px rgba(150,92,52,0.08)",
+  boxShadow: "0 18px 36px rgba(30,18,12,0.14)",
 }
 
 const titleStyle = {
@@ -323,8 +327,8 @@ const emptyStateStyle = {
   margin: "0 auto",
   padding: "28px",
   borderRadius: "24px",
-  background: "white",
-  boxShadow: "0 18px 36px rgba(150,92,52,0.08)",
+  background: "rgba(255,255,255,0.9)",
+  boxShadow: "0 18px 36px rgba(30,18,12,0.14)",
   display: "grid",
   gap: "14px",
   justifyItems: "start",
@@ -396,8 +400,8 @@ const gridStyle = {
 const cardStyle = {
   padding: "22px",
   borderRadius: "22px",
-  background: "white",
-  boxShadow: "0 18px 36px rgba(150,92,52,0.08)",
+  background: "rgba(255,255,255,0.92)",
+  boxShadow: "0 18px 36px rgba(30,18,12,0.14)",
 }
 
 const badgeStyle = {
