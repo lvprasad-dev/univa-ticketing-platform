@@ -265,16 +265,14 @@ const headerStyle = {
 
 const titleStyle = {
   margin: "0 0 4px",
-  color: "#fff4eb",
+  color: "#20120d",
   fontSize: "28px",
-  textShadow: "0 4px 14px rgba(20, 12, 8, 0.35)",
 }
 
 const textStyle = {
   margin: 0,
-  color: "rgba(255, 241, 230, 0.9)",
+  color: "#3f281d",
   fontSize: "13px",
-  textShadow: "0 3px 12px rgba(20, 12, 8, 0.28)",
 }
 
 const formStyle = {
@@ -297,15 +295,14 @@ const fullWidthFieldStyle = {
 }
 
 const labelStyle = {
-  color: "#fff2e7",
+  color: "#251711",
   fontWeight: "700",
   fontSize: "12px",
-  textShadow: "0 2px 8px rgba(20, 12, 8, 0.28)",
 }
 
 const helperTextStyle = {
   marginTop: "0",
-  color: "rgba(255, 238, 226, 0.82)",
+  color: "#5e463b",
   fontSize: "11px",
 }
 
@@ -313,11 +310,11 @@ const inputStyle = {
   width: "100%",
   padding: "10px 12px",
   borderRadius: "10px",
-  border: "1px solid rgba(255, 255, 255, 0.16)",
-  background: "rgba(54, 30, 18, 0.32)",
+  border: "1px solid rgba(99, 69, 54, 0.2)",
+  background: "rgba(255, 255, 255, 0.96)",
   fontSize: "13px",
-  color: "#fff7f2",
-  boxShadow: "inset 0 1px 0 rgba(255,255,255,0.06)",
+  color: "#20120d",
+  boxShadow: "0 8px 18px rgba(34, 22, 16, 0.08)",
 }
 
 const textareaStyle = {
@@ -350,7 +347,6 @@ const submitButtonStyle = {
 const errorStyle = {
   gridColumn: "1 / -1",
   margin: 0,
-  color: "#fff0f0",
+  color: "#9f1d1d",
   fontWeight: "600",
-  textShadow: "0 2px 8px rgba(20, 12, 8, 0.3)",
 }
