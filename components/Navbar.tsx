@@ -3,8 +3,26 @@
 import { AuthChangeEvent, Session } from "@supabase/supabase-js"
 import Link from "next/link"
 import Image from "next/image"
-import { ChangeEvent, FormEvent, useCallback, useEffect, useRef, useState } from "react"
+import {
+  ChangeEvent,
+  FormEvent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react"
 import { usePathname, useRouter } from "next/navigation"
+import {
+  getNotificationHeading,
+  getNotifications,
+  getUnreadNotificationCount,
+  markAllNotificationsRead,
+  pushNotification,
+  seedNotifications,
+  subscribeToNotifications,
+  type AppNotification,
+} from "@/lib/notifications"
 import { supabase } from "@/lib/supabaseClient"
 
 type City = {
@@ -21,31 +39,6 @@ type LocationAddress = Partial<
   >
 >
 
-type NavbarNotification = {
-  id: string
-  message: string
-}
-
-const getNotificationHeading = (message: string, index: number) => {
-  if (message.toLowerCase().includes("welcome back")) {
-    return "Welcome Back"
-  }
-
-  if (message.toLowerCase().includes("welcome to univa")) {
-    return "Welcome to UNIVA"
-  }
-
-  if (message.toLowerCase().includes("movies") || message.toLowerCase().includes("travel")) {
-    return "Fresh Updates"
-  }
-
-  if (message.toLowerCase().includes("create event")) {
-    return "Creator Tools"
-  }
-
-  return `Notification ${index + 1}`
-}
-
 const cities = [
   { name: "Guntur", lat: 16.3067, lon: 80.4365 },
   { name: "Vijayawada", lat: 16.5062, lon: 80.648 },
@@ -61,9 +54,6 @@ const selectedLocationKey = "univa-selected-location"
 const selectedLocationEvent = "univa-location-change"
 const hasLoggedInBeforeKey = "univa-has-logged-in-before"
 const loginHandledKey = "univa-login-handled"
-const seededNotificationsKey = "univa-seeded-notifications-v3"
-const notificationsStorageKey = "univa-navbar-notifications"
-const notificationsClearedEvent = "univa-notifications-cleared"
 const ticketingLinks = [
   { href: "/movies", label: "Movies" },
   { href: "/travel", label: "Travel" },
@@ -166,11 +156,19 @@ export default function Navbar() {
   const [profilePhoto, setProfilePhoto] = useState("")
   const [showEditPicAction, setShowEditPicAction] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
-  const [notifications, setNotifications] = useState<NavbarNotification[]>([])
-  const [unreadNotificationCount, setUnreadNotificationCount] = useState(0)
   const [showNotificationsPanel, setShowNotificationsPanel] = useState(false)
   const [activeNotificationId, setActiveNotificationId] = useState("")
   const fileInputRef = useRef<HTMLInputElement | null>(null)
+  const notifications = useSyncExternalStore(
+    subscribeToNotifications,
+    getNotifications,
+    () => [] as AppNotification[]
+  )
+  const unreadNotificationCount = useSyncExternalStore(
+    subscribeToNotifications,
+    getUnreadNotificationCount,
+    () => 0
+  )
 
   const navLinks = [
     { href: "/profile", label: "Profile" },
@@ -243,61 +241,14 @@ export default function Navbar() {
   }, [isSimpleNavbarPage])
 
   useEffect(() => {
-    const storedNotifications = window.localStorage.getItem(notificationsStorageKey)
-
-    if (storedNotifications) {
-      try {
-        const parsedNotifications = JSON.parse(storedNotifications) as NavbarNotification[]
-        if (parsedNotifications.length > 0) {
-          setNotifications(parsedNotifications)
-          setUnreadNotificationCount(parsedNotifications.length)
-          setActiveNotificationId(parsedNotifications[0]?.id || "")
-          return
-        }
-      } catch {
-        window.localStorage.removeItem(notificationsStorageKey)
-      }
-    }
-
-    if (window.sessionStorage.getItem(seededNotificationsKey) === "true") {
-      return
-    }
-
-    const seededNotifications = [
-      { id: "seed-1", message: "Welcome to UNIVA. Your account is ready to explore events." },
-      { id: "seed-2", message: "New movies and travel updates are waiting for you." },
-      { id: "seed-3", message: "Create Event tools are available whenever you are ready." },
-      { id: "seed-4", message: "Check notifications often to stay updated with new activity." },
-    ]
-
-    setNotifications(seededNotifications)
-    setUnreadNotificationCount(seededNotifications.length)
-    setActiveNotificationId(seededNotifications[0].id)
-    window.localStorage.setItem(
-      notificationsStorageKey,
-      JSON.stringify(seededNotifications)
-    )
-    window.sessionStorage.setItem(seededNotificationsKey, "true")
+    seedNotifications()
   }, [])
 
-  useEffect(() => {
-    window.localStorage.setItem(
-      notificationsStorageKey,
-      JSON.stringify(notifications)
-    )
-  }, [notifications])
-
-  useEffect(() => {
-    const handleNotificationsCleared = () => {
-      setUnreadNotificationCount(0)
-    }
-
-    window.addEventListener(notificationsClearedEvent, handleNotificationsCleared)
-
-    return () => {
-      window.removeEventListener(notificationsClearedEvent, handleNotificationsCleared)
-    }
-  }, [])
+  const resolvedActiveNotificationId = notifications.some(
+    (notification) => notification.id === activeNotificationId
+  )
+    ? activeNotificationId
+    : notifications[0]?.id || ""
 
   useEffect(() => {
     const savedProfilePhoto = window.localStorage.getItem(profilePhotoKey)
@@ -349,14 +300,14 @@ export default function Navbar() {
             window.sessionStorage.getItem(loginHandledKey) === "true"
 
           if (!alreadyHandledInSession) {
-            const nextNotification = {
-              id: `${Date.now()}`,
+            const nextNotification = pushNotification({
+              title: hasLoggedInBefore ? "Welcome Back" : "Welcome to UNIVA",
               message: hasLoggedInBefore
                 ? `Welcome back, ${resolvedName}!`
                 : `Welcome to UNIVA, ${resolvedName}!`,
-            }
-            setNotifications((current) => [nextNotification, ...current])
-            setUnreadNotificationCount((current) => current + 1)
+              href: "/profile",
+              source: "auth",
+            })
             setActiveNotificationId(nextNotification.id)
             window.localStorage.setItem(hasLoggedInBeforeKey, "true")
             window.sessionStorage.setItem(loginHandledKey, "true")
@@ -730,8 +681,7 @@ export default function Navbar() {
                   type="button"
                   onClick={() => {
                     setShowNotificationsPanel(true)
-                    setUnreadNotificationCount(0)
-                    window.dispatchEvent(new Event(notificationsClearedEvent))
+                    markAllNotificationsRead()
                   }}
                   style={notificationButtonStyle}
                 >
@@ -778,7 +728,7 @@ export default function Navbar() {
           <div style={notificationsListStyle}>
             {notifications.length > 0 ? (
               notifications.map((notification, index) => {
-                const isActive = notification.id === activeNotificationId
+                const isActive = notification.id === resolvedActiveNotificationId
 
                 return (
                   <button
@@ -793,9 +743,12 @@ export default function Navbar() {
                       ...notificationCardStyle,
                       background: isActive ? "#fff7f0" : "#f8f5ff",
                     }}
-                  >
+                    >
                     <p style={notificationHeadingStyle}>
-                      {getNotificationHeading(notification.message, index)}
+                      {getNotificationHeading(notification, index)}
+                    </p>
+                    <p style={notificationMetaStyle}>
+                      {new Date(notification.createdAt).toLocaleString()}
                     </p>
                     {isActive && (
                       <p style={notificationMessageStyle}>{notification.message}</p>
@@ -1089,6 +1042,12 @@ const notificationHeadingStyle = {
   color: "#221a3c",
   fontSize: "16px",
   fontWeight: "700",
+}
+
+const notificationMetaStyle = {
+  margin: "8px 0 0",
+  color: "#8a83a3",
+  fontSize: "12px",
 }
 
 const notificationMessageStyle = {

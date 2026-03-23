@@ -4,7 +4,9 @@ import Link from "next/link"
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react"
 
 type Listing = {
+  id?: string
   title: string
+  category?: string
   city: string
   venue: string
   area: string
@@ -12,6 +14,9 @@ type Listing = {
   lat: number
   lon: number
   meta: string
+  availableTickets?: number
+  eventDate?: string
+  locationUrl?: string | null
 }
 
 type Coordinates = {
@@ -25,6 +30,18 @@ type TicketingCategoryPageProps = {
   description: string
   icon: string
   listings: Listing[]
+}
+
+type EventRecord = {
+  id: string
+  title: string
+  category: string
+  city: string
+  venue: string
+  location_url?: string | null
+  event_date: string
+  price: number
+  available_tickets: number
 }
 
 const selectedLocationKey = "univa-selected-location"
@@ -71,6 +88,8 @@ export default function TicketingCategoryPage({
   listings,
 }: TicketingCategoryPageProps) {
   const [currentCoordinates, setCurrentCoordinates] = useState<Coordinates | null>(null)
+  const [liveListings, setLiveListings] = useState<Listing[]>([])
+  const [isLoadingLiveListings, setIsLoadingLiveListings] = useState(true)
   const locationLabel = useSyncExternalStore(
     (onStoreChange) => {
       if (typeof window === "undefined") {
@@ -109,19 +128,71 @@ export default function TicketingCategoryPage({
     )
   }, [])
 
+  useEffect(() => {
+    let isMounted = true
+
+    const loadLiveListings = async () => {
+      const response = await fetch(`/api/events?category=${encodeURIComponent(category)}`, {
+        cache: "no-store",
+      })
+      const payload = (await response.json()) as { events?: EventRecord[]; error?: string }
+
+      if (!isMounted) {
+        return
+      }
+
+      if (!response.ok) {
+        setLiveListings([])
+        setIsLoadingLiveListings(false)
+        return
+      }
+
+      const normalizedListings = (payload.events ?? []).map((event) => ({
+        id: event.id,
+        title: event.title,
+        category: event.category,
+        city: event.city,
+        venue: event.venue,
+        area: event.city,
+        price: `Rs.${event.price}`,
+        lat: 0,
+        lon: 0,
+        meta: new Date(event.event_date).toLocaleString(),
+        availableTickets: event.available_tickets,
+        eventDate: event.event_date,
+        locationUrl: event.location_url ?? null,
+      }))
+
+      setLiveListings(normalizedListings)
+      setIsLoadingLiveListings(false)
+    }
+
+    loadLiveListings()
+
+    return () => {
+      isMounted = false
+    }
+  }, [category])
+
   const selectedCity = useMemo(
     () => getCityFromLocation(locationLabel),
     [locationLabel]
   )
 
+  const sourceListings = liveListings.length > 0 ? liveListings : listings
+
   const cityListings = useMemo(() => {
-    const filteredListings = listings.filter((listing) => listing.city === selectedCity)
+    const filteredListings = sourceListings.filter((listing) => listing.city === selectedCity)
 
     if (!currentCoordinates) {
       return filteredListings
     }
 
     return [...filteredListings].sort((firstListing, secondListing) => {
+      if (!firstListing.lat || !firstListing.lon || !secondListing.lat || !secondListing.lon) {
+        return 0
+      }
+
       const firstDistance = getDistance(
         currentCoordinates.lat,
         currentCoordinates.lon,
@@ -137,9 +208,9 @@ export default function TicketingCategoryPage({
 
       return firstDistance - secondDistance
     })
-  }, [currentCoordinates, listings, selectedCity])
+  }, [currentCoordinates, selectedCity, sourceListings])
 
-  const visibleListings = cityListings.length > 0 ? cityListings : listings
+  const visibleListings = cityListings.length > 0 ? cityListings : sourceListings
 
   return (
     <main style={pageStyle}>
@@ -154,9 +225,15 @@ export default function TicketingCategoryPage({
       </section>
 
       <section style={gridStyle}>
+        {isLoadingLiveListings && (
+          <p style={statusTextStyle}>Loading live ticket availability...</p>
+        )}
+
         {visibleListings.map((listing) => {
           const distance =
             currentCoordinates &&
+            listing.lat &&
+            listing.lon &&
             getDistance(
               currentCoordinates.lat,
               currentCoordinates.lon,
@@ -175,12 +252,43 @@ export default function TicketingCategoryPage({
               </p>
               <p style={cardMetaStyle}>{listing.title}</p>
               <p style={cardMetaStyle}>{listing.meta}</p>
+              <p style={listingModeStyle(listing.id)}>
+                {listing.id ? "Live booking available" : "Sample preview only"}
+              </p>
+              {typeof listing.availableTickets === "number" && (
+                <p style={availabilityStyle}>{listing.availableTickets} tickets left</p>
+              )}
+              {listing.eventDate && (
+                <p style={cardMetaStyle}>{new Date(listing.eventDate).toLocaleString()}</p>
+              )}
               <p style={distanceStyle}>
                 {distance ? `${distance.toFixed(1)} km away` : "Distance unavailable"}
               </p>
               <p style={priceStyle}>{listing.price}</p>
-              <Link href="/checkout" className="primary-cta" style={actionStyle}>
-                Book Now
+              <Link
+                href={
+                  {
+                    pathname: "/checkout",
+                    query: {
+                      eventId: listing.id ?? "",
+                      category,
+                      title: listing.title,
+                      venue: listing.venue,
+                      city: listing.city,
+                      price: listing.price.replace(/[^\d]/g, ""),
+                      availableTickets:
+                        typeof listing.availableTickets === "number"
+                          ? String(listing.availableTickets)
+                          : "",
+                      eventDate: listing.eventDate ?? "",
+                      isLive: listing.id ? "true" : "false",
+                    },
+                  }
+                }
+                className="primary-cta"
+                style={actionStyle}
+              >
+                {listing.id ? "Book Now" : "Preview Price"}
               </Link>
             </article>
           )
@@ -275,11 +383,34 @@ const distanceStyle = {
   fontWeight: "700",
 }
 
+const availabilityStyle = {
+  marginBottom: "6px",
+  color: "#1f7a45",
+  fontWeight: "700",
+}
+
+const listingModeStyle = (isLive?: string) => ({
+  display: "inline-block",
+  marginBottom: "8px",
+  padding: "6px 10px",
+  borderRadius: "999px",
+  background: isLive ? "#e8f7eb" : "#fff0e3",
+  color: isLive ? "#216e39" : "#d76a00",
+  fontWeight: "700",
+  fontSize: "12px",
+})
+
 const priceStyle = {
   margin: "14px 0 18px",
   color: "#ff7a00",
   fontWeight: "700",
   fontSize: "18px",
+}
+
+const statusTextStyle = {
+  gridColumn: "1 / -1",
+  margin: 0,
+  color: "#5d6475",
 }
 
 const actionStyle = {

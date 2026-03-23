@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react"
 import { useRouter } from "next/navigation"
+import { pushNotification } from "@/lib/notifications"
 import { supabase } from "@/lib/supabaseClient"
 
 const initialForm = {
@@ -64,6 +65,13 @@ export default function CreateEventPage() {
       setIsSubmitting(false)
       return
     }
+
+    pushNotification({
+      title: "Event Created",
+      message: `${form.title} was created successfully and added to your events list.`,
+      href: "/my-events",
+      source: "events",
+    })
 
     router.push("/my-events")
   }

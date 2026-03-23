@@ -28,6 +28,31 @@ export default function LoginPageClient({
   const router = useRouter()
   const statusMessage = message || authMessage
 
+  const normalizePhoneNumber = (value: string) => {
+    const trimmedValue = value.trim()
+
+    if (!trimmedValue) {
+      return null
+    }
+
+    if (trimmedValue.startsWith("+")) {
+      const digitsOnly = `+${trimmedValue.slice(1).replace(/\D/g, "")}`
+      return digitsOnly.length > 1 ? digitsOnly : null
+    }
+
+    const digitsOnly = trimmedValue.replace(/\D/g, "")
+
+    if (digitsOnly.length === 10) {
+      return `+91${digitsOnly}`
+    }
+
+    if (digitsOnly.length === 12 && digitsOnly.startsWith("91")) {
+      return `+${digitsOnly}`
+    }
+
+    return null
+  }
+
   const handleSendEmailOtp = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setError("")
@@ -78,10 +103,17 @@ export default function LoginPageClient({
     event.preventDefault()
     setError("")
     setMessage("")
+    const normalizedPhone = normalizePhoneNumber(mobile)
+
+    if (!normalizedPhone) {
+      setError("Enter a valid mobile number. Use 10 digits or include country code.")
+      return
+    }
+
     setLoading(true)
 
     const { error: signInError } = await supabase.auth.signInWithOtp({
-      phone: mobile,
+      phone: normalizedPhone,
     })
 
     setLoading(false)
@@ -99,10 +131,17 @@ export default function LoginPageClient({
     event.preventDefault()
     setError("")
     setMessage("")
+    const normalizedPhone = normalizePhoneNumber(mobile)
+
+    if (!normalizedPhone) {
+      setError("Enter a valid mobile number. Use 10 digits or include country code.")
+      return
+    }
+
     setLoading(true)
 
     const { error: verifyError } = await supabase.auth.verifyOtp({
-      phone: mobile,
+      phone: normalizedPhone,
       token: mobileOtp,
       type: "sms",
     })
@@ -210,6 +249,7 @@ export default function LoginPageClient({
               value={mobile}
               onChange={(event) => setMobile(event.target.value)}
               autoComplete="tel"
+              inputMode="tel"
               style={input}
               required
             />
@@ -227,7 +267,7 @@ export default function LoginPageClient({
             <p style={helperText}>
               {mobileOtpSent
                 ? "Enter the OTP sent to your mobile number."
-                : "We will send a one-time OTP to your mobile number."}
+                : "We will send an OTP to your mobile number. 10-digit numbers are treated as +91."}
             </p>
 
             <button style={orangeSubmitBtn} disabled={loading || providerLoading !== null}>

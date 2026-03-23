@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { useEffect, useMemo, useState } from "react"
+import { pushNotification } from "@/lib/notifications"
 import { supabase } from "@/lib/supabaseClient"
 
 type BookingRecord = {
@@ -17,6 +18,8 @@ type BookingRecord = {
     event_date: string
   } | null
 }
+
+const seenBookingNotificationsKey = "univa-seen-booking-notifications"
 
 export default function MyTicketsPage() {
   const [bookings, setBookings] = useState<BookingRecord[]>([])
@@ -74,8 +77,34 @@ export default function MyTicketsPage() {
       }
 
       if (isMounted) {
-        setBookings((payload as { bookings?: BookingRecord[] }).bookings ?? [])
+        const nextBookings = (payload as { bookings?: BookingRecord[] }).bookings ?? []
+        setBookings(nextBookings)
         setIsLoading(false)
+
+        const seenBookingIds = new Set(
+          JSON.parse(window.localStorage.getItem(seenBookingNotificationsKey) || "[]") as string[]
+        )
+
+        const newlySeenConfirmedBookings = nextBookings.filter(
+          (booking) => booking.booking_status === "confirmed" && !seenBookingIds.has(booking.id)
+        )
+
+        for (const booking of newlySeenConfirmedBookings) {
+          pushNotification({
+            title: "Ticket Booked",
+            message: `${
+              booking.events?.title ?? "Your event"
+            } ticket booking is confirmed.`,
+            href: "/my-tickets",
+            source: "bookings",
+          })
+          seenBookingIds.add(booking.id)
+        }
+
+        window.localStorage.setItem(
+          seenBookingNotificationsKey,
+          JSON.stringify([...seenBookingIds])
+        )
       }
     }
 

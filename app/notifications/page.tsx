@@ -1,59 +1,28 @@
 "use client"
 
-import { useEffect, useState } from "react"
-
-type NotificationItem = {
-  id: string
-  message: string
-}
-
-const notificationsStorageKey = "univa-navbar-notifications"
-const notificationsClearedEvent = "univa-notifications-cleared"
-
-const getNotificationHeading = (message: string, index: number) => {
-  if (message.toLowerCase().includes("welcome back")) {
-    return "Welcome Back"
-  }
-
-  if (message.toLowerCase().includes("welcome to univa")) {
-    return "Welcome to UNIVA"
-  }
-
-  if (message.toLowerCase().includes("movies") || message.toLowerCase().includes("travel")) {
-    return "Fresh Updates"
-  }
-
-  if (message.toLowerCase().includes("create event")) {
-    return "Creator Tools"
-  }
-
-  return `Notification ${index + 1}`
-}
+import { useEffect, useState, useSyncExternalStore } from "react"
+import {
+  getNotificationHeading,
+  getNotifications,
+  markAllNotificationsRead,
+  subscribeToNotifications,
+} from "@/lib/notifications"
 
 export default function NotificationsPage() {
-  const [notifications] = useState<NotificationItem[]>(() => {
-    if (typeof window === "undefined") {
-      return []
-    }
-
-    const storedNotifications = window.localStorage.getItem(notificationsStorageKey)
-
-    if (!storedNotifications) {
-      return []
-    }
-
-    try {
-      return JSON.parse(storedNotifications) as NotificationItem[]
-    } catch {
-      return []
-    }
-  })
+  const notifications = useSyncExternalStore(
+    subscribeToNotifications,
+    getNotifications,
+    () => []
+  )
   const [activeId, setActiveId] = useState<string>(notifications[0]?.id || "")
 
   useEffect(() => {
-    window.localStorage.setItem(notificationsStorageKey, "[]")
-    window.dispatchEvent(new Event(notificationsClearedEvent))
+    markAllNotificationsRead()
   }, [])
+
+  const resolvedActiveId = notifications.some((notification) => notification.id === activeId)
+    ? activeId
+    : notifications[0]?.id || ""
 
   return (
     <main
@@ -114,7 +83,7 @@ export default function NotificationsPage() {
         <div style={{ display: "grid", gap: "12px" }}>
           {notifications.length > 0 ? (
             notifications.map((notification, index) => {
-              const isActive = notification.id === activeId
+              const isActive = notification.id === resolvedActiveId
 
               return (
                 <button
@@ -142,7 +111,16 @@ export default function NotificationsPage() {
                       fontWeight: "700",
                     }}
                   >
-                    {getNotificationHeading(notification.message, index)}
+                    {getNotificationHeading(notification, index)}
+                  </p>
+                  <p
+                    style={{
+                      margin: "8px 0 0",
+                      color: "#8a83a3",
+                      fontSize: "12px",
+                    }}
+                  >
+                    {new Date(notification.createdAt).toLocaleString()}
                   </p>
                   {isActive && (
                     <p

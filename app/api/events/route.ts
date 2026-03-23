@@ -17,9 +17,12 @@ const parseJsonResponse = async (response: Response) => {
 
 export async function GET(request: NextRequest) {
   const organizerId = request.nextUrl.searchParams.get("organizerId")
-  const query = organizerId
-    ? `events?select=*&organizer_id=eq.${organizerId}&order=event_date.asc`
-    : "events?select=*&order=event_date.asc"
+  const category = request.nextUrl.searchParams.get("category")
+  const filters = [
+    organizerId ? `organizer_id=eq.${organizerId}` : null,
+    category ? `category=eq.${encodeURIComponent(category)}` : null,
+  ].filter(Boolean)
+  const query = `events?select=*&${filters.join("&")}${filters.length > 0 ? "&" : ""}order=event_date.asc`
 
   const response = await fetch(getSupabaseRestUrl(query), {
     headers: createSupabaseHeaders(),
