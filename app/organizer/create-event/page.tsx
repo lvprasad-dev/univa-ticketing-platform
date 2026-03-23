@@ -244,10 +244,11 @@ const cardStyle = {
   maxWidth: "980px",
   margin: "0 auto",
   padding: "18px",
-  borderRadius: "18px",
-  background: "rgba(255,255,255,0.88)",
-  boxShadow: "0 18px 34px rgba(30,18,12,0.16)",
-  backdropFilter: "blur(4px)",
+  borderRadius: "20px",
+  background: "rgba(255, 246, 238, 0.26)",
+  boxShadow: "0 12px 28px rgba(30,18,12,0.12)",
+  backdropFilter: "blur(2px)",
+  border: "1px solid rgba(255,255,255,0.18)",
   maxHeight: "calc(100vh - 87px)",
   overflow: "hidden" as const,
 }
@@ -305,9 +306,10 @@ const inputStyle = {
   width: "100%",
   padding: "10px 12px",
   borderRadius: "10px",
-  border: "1px solid #f0c7b2",
-  background: "rgba(255,250,247,0.96)",
+  border: "1px solid rgba(255, 232, 220, 0.42)",
+  background: "rgba(255, 248, 242, 0.44)",
   fontSize: "13px",
+  color: "#3d2419",
 }
 
 const textareaStyle = {
@@ -330,10 +332,11 @@ const submitButtonStyle = {
   border: "none",
   padding: "10px 18px",
   borderRadius: "10px",
-  background: "#ff7a00",
+  background: "rgba(255, 122, 0, 0.88)",
   color: "white",
   fontWeight: "700",
   cursor: "pointer",
+  boxShadow: "0 10px 22px rgba(255, 122, 0, 0.22)",
 }
 
 const errorStyle = {
