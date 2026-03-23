@@ -17,6 +17,8 @@ type EventRecord = {
   available_tickets: number
 }
 
+const PLATFORM_FEE = 11
+
 export default function CheckoutPageClient() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -84,7 +86,7 @@ export default function CheckoutPageClient() {
   }
 
   const ticketSubtotal = resolvedEvent.price * quantity
-  const platformFee = Math.round(ticketSubtotal * 0.05)
+  const platformFee = PLATFORM_FEE
   const totalAmount = ticketSubtotal + platformFee
 
   const handleBooking = async () => {
