@@ -19,7 +19,6 @@ import {
   getUnreadNotificationCount,
   markAllNotificationsRead,
   pushNotification,
-  seedNotifications,
   subscribeToNotifications,
   type AppNotification,
 } from "@/lib/notifications"
@@ -54,6 +53,8 @@ const selectedLocationKey = "univa-selected-location"
 const selectedLocationEvent = "univa-location-change"
 const hasLoggedInBeforeKey = "univa-has-logged-in-before"
 const loginHandledKey = "univa-login-handled"
+const lastAuthNotificationKey = "univa-last-auth-notification"
+const inactivityTimeoutMs = 30 * 60 * 1000
 const ticketingLinks = [
   { href: "/movies", label: "Movies" },
   { href: "/travel", label: "Travel" },
@@ -274,10 +275,6 @@ export default function Navbar() {
     }
   }, [isSimpleNavbarPage])
 
-  useEffect(() => {
-    seedNotifications()
-  }, [])
-
   const resolvedActiveNotificationId = notifications.some(
     (notification) => notification.id === activeNotificationId
   )
@@ -332,24 +329,28 @@ export default function Navbar() {
             getLocalStorageValue(hasLoggedInBeforeKey) === "true"
           const alreadyHandledInSession =
             getSessionStorageValue(loginHandledKey) === "true"
+          const currentAuthMarker = `${session.user.id}:${session.access_token.slice(-12)}`
+          const lastAuthMarker = getSessionStorageValue(lastAuthNotificationKey)
 
-          if (!alreadyHandledInSession) {
+          if (!alreadyHandledInSession && lastAuthMarker !== currentAuthMarker) {
             const nextNotification = pushNotification({
-              title: hasLoggedInBefore ? "Welcome Back" : "Welcome to UNIVA",
+              title: `Hello ${resolvedName}!`,
               message: hasLoggedInBefore
-                ? `Welcome back, ${resolvedName}!`
-                : `Welcome to UNIVA, ${resolvedName}!`,
+                ? `Welcome back, ${resolvedName}! Continue where you left off.`
+                : `Welcome to UNIVA, ${resolvedName}! Your account is ready to explore events.`,
               href: "/profile",
               source: "auth",
             })
             setActiveNotificationId(nextNotification.id)
             setLocalStorageValue(hasLoggedInBeforeKey, "true")
             setSessionStorageValue(loginHandledKey, "true")
+            setSessionStorageValue(lastAuthNotificationKey, currentAuthMarker)
           }
         }
 
         if (event === "SIGNED_OUT") {
           removeSessionStorageValue(loginHandledKey)
+          removeSessionStorageValue(lastAuthNotificationKey)
         }
       }
     )
@@ -359,6 +360,49 @@ export default function Navbar() {
       subscription.unsubscribe()
     }
   }, [])
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      return
+    }
+
+    let timeoutId = 0
+
+    const resetLogoutTimer = () => {
+      window.clearTimeout(timeoutId)
+      timeoutId = window.setTimeout(async () => {
+        removeSessionStorageValue(sidebarOpenKey)
+        removeSessionStorageValue(loginHandledKey)
+        removeSessionStorageValue(lastAuthNotificationKey)
+        await supabase.auth.signOut()
+        setShowSidebar(false)
+        setShowNotificationsPanel(false)
+        router.push("/login?message=Session%20expired%20after%2030%20minutes%20of%20inactivity.")
+      }, inactivityTimeoutMs)
+    }
+
+    const activityEvents: Array<keyof WindowEventMap> = [
+      "click",
+      "keydown",
+      "mousemove",
+      "scroll",
+      "touchstart",
+    ]
+
+    for (const activityEvent of activityEvents) {
+      window.addEventListener(activityEvent, resetLogoutTimer, { passive: true })
+    }
+
+    resetLogoutTimer()
+
+    return () => {
+      window.clearTimeout(timeoutId)
+
+      for (const activityEvent of activityEvents) {
+        window.removeEventListener(activityEvent, resetLogoutTimer)
+      }
+    }
+  }, [isLoggedIn, router])
 
   const handleProfilePhotoChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]

@@ -154,7 +154,7 @@ export default function CheckoutPageClient() {
 
     pushNotification({
       title: "Booking Confirmed",
-      message: `${event.title} booking is confirmed for ${quantity} ticket(s).`,
+      message: `${event.title} booking is confirmed for ${quantity} ticket(s) at ${event.venue}, ${event.city}. Event time: ${new Date(event.event_date).toLocaleString()}. Total paid: Rs.${totalAmount}.`,
       href: "/my-tickets",
       source: "bookings",
     })

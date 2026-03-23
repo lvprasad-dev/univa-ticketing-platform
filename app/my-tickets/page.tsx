@@ -21,11 +21,27 @@ type BookingRecord = {
 
 const seenBookingNotificationsKey = "univa-seen-booking-notifications"
 
+const getTicketLifecycleStatus = (booking: BookingRecord, currentTime: number) => {
+  const eventTime = booking.events?.event_date
+    ? new Date(booking.events.event_date).getTime()
+    : 0
+
+  if (booking.booking_status !== "confirmed") {
+    return "Inactive"
+  }
+
+  if (eventTime !== 0 && eventTime < currentTime) {
+    return "Disconnected"
+  }
+
+  return "Active"
+}
+
 export default function MyTicketsPage() {
   const [bookings, setBookings] = useState<BookingRecord[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [errorMessage, setErrorMessage] = useState("")
-  const [activeTab, setActiveTab] = useState<"Active" | "Inactive">("Active")
+  const [activeTab, setActiveTab] = useState<"Active" | "History">("Active")
   const [currentTime, setCurrentTime] = useState(() => new Date().getTime())
 
   useEffect(() => {
@@ -92,9 +108,15 @@ export default function MyTicketsPage() {
         for (const booking of newlySeenConfirmedBookings) {
           pushNotification({
             title: "Ticket Booked",
-            message: `${
-              booking.events?.title ?? "Your event"
-            } ticket booking is confirmed.`,
+            message: `${booking.events?.title ?? "Your event"} booking is confirmed for ${
+              booking.quantity
+            } ticket(s). Venue: ${booking.events?.venue ?? "Venue unavailable"}, ${
+              booking.events?.city ?? "City unavailable"
+            }. Event time: ${
+              booking.events?.event_date
+                ? new Date(booking.events.event_date).toLocaleString()
+                : "Unavailable"
+            }. Total paid: Rs.${booking.total_amount}.`,
             href: "/my-tickets",
             source: "bookings",
           })
@@ -123,26 +145,21 @@ export default function MyTicketsPage() {
     return () => window.clearInterval(timer)
   }, [])
 
-  const { activeTickets, inactiveTickets } = useMemo(() => {
+  const { activeTickets, historyTickets } = useMemo(() => {
     const active: BookingRecord[] = []
-    const inactive: BookingRecord[] = []
+    const history: BookingRecord[] = []
 
     for (const booking of bookings) {
-      const eventTime = booking.events?.event_date
-        ? new Date(booking.events.event_date).getTime()
-        : 0
-      const isInactive =
-        booking.booking_status !== "confirmed" ||
-        (eventTime !== 0 && eventTime < currentTime)
+      const lifecycleStatus = getTicketLifecycleStatus(booking, currentTime)
 
-      if (isInactive) {
-        inactive.push(booking)
-      } else {
+      if (lifecycleStatus === "Active") {
         active.push(booking)
+      } else {
+        history.push(booking)
       }
     }
 
-    return { activeTickets: active, inactiveTickets: inactive }
+    return { activeTickets: active, historyTickets: history }
   }, [bookings, currentTime])
 
   const activeSection =
@@ -153,16 +170,16 @@ export default function MyTicketsPage() {
           headerText: "Your upcoming booked tickets appear here.",
         }
       : {
-          tickets: inactiveTickets,
-          emptyText: "No inactive tickets yet.",
-          headerText: "Past and inactive bookings stay here for your records.",
+          tickets: historyTickets,
+          emptyText: "No ticket history yet.",
+          headerText: "Past, expired, and inactive bookings stay here for your records.",
         }
 
   return (
     <main style={pageStyle}>
       <section style={tabBarWrapStyle}>
         <div style={tabBarStyle}>
-          {(["Active", "Inactive"] as const).map((tab) => (
+          {(["Active", "History"] as const).map((tab) => (
             <button
               key={tab}
               type="button"
@@ -220,7 +237,7 @@ export default function MyTicketsPage() {
               {activeSection.tickets.map((booking) => (
                 <article key={booking.id} style={cardStyle}>
                   <p style={badgeStyle}>
-                    {activeTab === "Active" ? "Active Ticket" : "Inactive Ticket"}
+                    {getTicketLifecycleStatus(booking, currentTime)} Ticket
                   </p>
                   <h3 style={cardTitleStyle}>
                     {booking.events?.title ?? "Booked Event"}
@@ -237,8 +254,7 @@ export default function MyTicketsPage() {
                   <p style={priceStyle}>Rs.{booking.total_amount}</p>
                   <p style={ticketsStyle}>{booking.quantity} ticket(s) booked</p>
                   <p style={statusStyle}>
-                    Status: {booking.booking_status.charAt(0).toUpperCase()}
-                    {booking.booking_status.slice(1)}
+                    Status: {getTicketLifecycleStatus(booking, currentTime)}
                   </p>
                   <p style={bookedAtStyle}>
                     Booked on {new Date(booking.booked_at).toLocaleDateString()}

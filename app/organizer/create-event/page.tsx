@@ -68,7 +68,7 @@ export default function CreateEventPage() {
 
     pushNotification({
       title: "Event Created",
-      message: `${form.title} was created successfully and added to your events list.`,
+      message: `${form.title} was created successfully for ${form.city} at ${form.venue}. Scheduled on ${new Date(form.eventDate).toLocaleString()}.`,
       href: "/my-events",
       source: "events",
     })
