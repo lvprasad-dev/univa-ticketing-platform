@@ -143,7 +143,7 @@ export default function CreateEventPage() {
           </label>
 
           <label style={fullWidthFieldStyle}>
-            <span style={labelStyle}>Venue Location Link</span>
+            <span style={labelStyle}>Venue Location Link (Optional)</span>
             <input
               type="url"
               placeholder="https://maps.google.com/..."
@@ -153,6 +153,9 @@ export default function CreateEventPage() {
               }
               style={inputStyle}
             />
+            <span style={helperTextStyle}>
+              Add a map link if you have one. You can leave this empty.
+            </span>
           </label>
 
           <label style={fieldWrapperStyle}>
@@ -278,6 +281,12 @@ const fullWidthFieldStyle = {
 const labelStyle = {
   color: "#5f4032",
   fontWeight: "700",
+}
+
+const helperTextStyle = {
+  marginTop: "-2px",
+  color: "#8a6a5c",
+  fontSize: "12px",
 }
 
 const inputStyle = {
