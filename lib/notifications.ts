@@ -14,8 +14,11 @@ const notificationsStorageKey = "univa-notifications-v1"
 const seededNotificationsKey = "univa-notifications-seeded-v1"
 const notificationsChangedEvent = "univa-notifications-changed"
 const notificationsChannelName = "univa-notifications"
+const emptyNotifications: AppNotification[] = []
 
 let notificationsChannel: BroadcastChannel | null = null
+let cachedNotificationsRaw = ""
+let cachedNotifications: AppNotification[] = emptyNotifications
 
 const canUseWindow = () => typeof window !== "undefined"
 
@@ -86,20 +89,32 @@ const dispatchNotificationsChanged = () => {
 
 const readNotifications = () => {
   if (!canUseWindow()) {
-    return [] as AppNotification[]
+    return emptyNotifications
   }
 
   const storedNotifications = safeLocalStorageGet(notificationsStorageKey)
 
   if (!storedNotifications) {
-    return []
+    cachedNotificationsRaw = ""
+    cachedNotifications = emptyNotifications
+    return cachedNotifications
+  }
+
+  if (storedNotifications === cachedNotificationsRaw) {
+    return cachedNotifications
   }
 
   try {
     const parsedNotifications = JSON.parse(storedNotifications) as AppNotification[]
-    return Array.isArray(parsedNotifications) ? parsedNotifications : []
+    cachedNotificationsRaw = storedNotifications
+    cachedNotifications = Array.isArray(parsedNotifications)
+      ? parsedNotifications
+      : emptyNotifications
+    return cachedNotifications
   } catch {
-    return []
+    cachedNotificationsRaw = storedNotifications
+    cachedNotifications = emptyNotifications
+    return cachedNotifications
   }
 }
 
