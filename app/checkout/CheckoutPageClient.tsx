@@ -190,7 +190,7 @@ export default function CheckoutPageClient() {
         {!isLoading && errorMessage && <p style={errorStyle}>{errorMessage}</p>}
         {!isLoading && successMessage && <p style={successStyle}>{successMessage}</p>}
 
-        {!isLoading && resolvedEvent.price > 0 && (
+        {!isLoading && (resolvedEvent.price > 0 || isFreeEvent) && (
           <div style={contentGridStyle}>
             <section style={summaryStyle}>
               <p style={badgeStyle}>{resolvedEvent.category}</p>

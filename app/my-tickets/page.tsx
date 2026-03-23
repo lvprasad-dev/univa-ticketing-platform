@@ -2,7 +2,6 @@
 
 import Link from "next/link"
 import { useEffect, useMemo, useState } from "react"
-import { pushNotification } from "@/lib/notifications"
 import { supabase } from "@/lib/supabaseClient"
 
 type BookingRecord = {
@@ -18,8 +17,6 @@ type BookingRecord = {
     event_date: string
   } | null
 }
-
-const seenBookingNotificationsKey = "univa-seen-booking-notifications"
 
 const getTicketLifecycleStatus = (booking: BookingRecord, currentTime: number) => {
   const eventTime = booking.events?.event_date
@@ -96,37 +93,6 @@ export default function MyTicketsPage() {
         const nextBookings = (payload as { bookings?: BookingRecord[] }).bookings ?? []
         setBookings(nextBookings)
         setIsLoading(false)
-
-        const seenBookingIds = new Set(
-          JSON.parse(window.localStorage.getItem(seenBookingNotificationsKey) || "[]") as string[]
-        )
-
-        const newlySeenConfirmedBookings = nextBookings.filter(
-          (booking) => booking.booking_status === "confirmed" && !seenBookingIds.has(booking.id)
-        )
-
-        for (const booking of newlySeenConfirmedBookings) {
-          pushNotification({
-            title: "Ticket Booked",
-            message: `${booking.events?.title ?? "Your event"} booking is confirmed for ${
-              booking.quantity
-            } ticket(s). Venue: ${booking.events?.venue ?? "Venue unavailable"}, ${
-              booking.events?.city ?? "City unavailable"
-            }. Event time: ${
-              booking.events?.event_date
-                ? new Date(booking.events.event_date).toLocaleString()
-                : "Unavailable"
-            }. Total paid: Rs.${booking.total_amount}.`,
-            href: "/my-tickets",
-            source: "bookings",
-          })
-          seenBookingIds.add(booking.id)
-        }
-
-        window.localStorage.setItem(
-          seenBookingNotificationsKey,
-          JSON.stringify([...seenBookingIds])
-        )
       }
     }
 

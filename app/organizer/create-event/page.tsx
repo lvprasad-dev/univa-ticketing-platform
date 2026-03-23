@@ -245,10 +245,10 @@ const cardStyle = {
   margin: "0 auto",
   padding: "18px",
   borderRadius: "20px",
-  background: "rgba(255, 246, 238, 0.26)",
-  boxShadow: "0 12px 28px rgba(30,18,12,0.12)",
-  backdropFilter: "blur(2px)",
-  border: "1px solid rgba(255,255,255,0.18)",
+  background: "transparent",
+  boxShadow: "none",
+  backdropFilter: "none",
+  border: "none",
   maxHeight: "calc(100vh - 87px)",
   overflow: "hidden" as const,
 }
@@ -263,14 +263,16 @@ const headerStyle = {
 
 const titleStyle = {
   margin: "0 0 4px",
-  color: "#3d2419",
+  color: "#fff4eb",
   fontSize: "28px",
+  textShadow: "0 4px 14px rgba(20, 12, 8, 0.35)",
 }
 
 const textStyle = {
   margin: 0,
-  color: "#785344",
+  color: "rgba(255, 241, 230, 0.9)",
   fontSize: "13px",
+  textShadow: "0 3px 12px rgba(20, 12, 8, 0.28)",
 }
 
 const formStyle = {
@@ -291,14 +293,15 @@ const fullWidthFieldStyle = {
 }
 
 const labelStyle = {
-  color: "#5f4032",
+  color: "#fff2e7",
   fontWeight: "700",
   fontSize: "12px",
+  textShadow: "0 2px 8px rgba(20, 12, 8, 0.28)",
 }
 
 const helperTextStyle = {
   marginTop: "0",
-  color: "#8a6a5c",
+  color: "rgba(255, 238, 226, 0.82)",
   fontSize: "11px",
 }
 
@@ -306,10 +309,11 @@ const inputStyle = {
   width: "100%",
   padding: "10px 12px",
   borderRadius: "10px",
-  border: "1px solid rgba(255, 232, 220, 0.42)",
-  background: "rgba(255, 248, 242, 0.44)",
+  border: "1px solid rgba(255, 255, 255, 0.16)",
+  background: "rgba(54, 30, 18, 0.32)",
   fontSize: "13px",
-  color: "#3d2419",
+  color: "#fff7f2",
+  boxShadow: "inset 0 1px 0 rgba(255,255,255,0.06)",
 }
 
 const textareaStyle = {
@@ -342,6 +346,7 @@ const submitButtonStyle = {
 const errorStyle = {
   gridColumn: "1 / -1",
   margin: 0,
-  color: "#d14343",
+  color: "#fff0f0",
   fontWeight: "600",
+  textShadow: "0 2px 8px rgba(20, 12, 8, 0.3)",
 }
