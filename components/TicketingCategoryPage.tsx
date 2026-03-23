@@ -47,6 +47,18 @@ type EventRecord = {
 const selectedLocationKey = "univa-selected-location"
 const selectedLocationEvent = "univa-location-change"
 
+const getStoredLocation = () => {
+  if (typeof window === "undefined") {
+    return "your location"
+  }
+
+  try {
+    return window.localStorage.getItem(selectedLocationKey) || "your location"
+  } catch {
+    return "your location"
+  }
+}
+
 const toRadians = (value: number) => (value * Math.PI) / 180
 
 const getDistance = (
@@ -106,7 +118,7 @@ export default function TicketingCategoryPage({
         window.removeEventListener(selectedLocationEvent, handleLocationChange)
       }
     },
-    () => window.localStorage.getItem(selectedLocationKey) || "your location",
+    () => getStoredLocation(),
     () => "your location"
   )
 

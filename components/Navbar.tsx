@@ -68,6 +68,40 @@ const headerLinks = [
   { href: "/my-tickets", label: "My Tickets" },
 ]
 
+const getLocalStorageValue = (key: string) => {
+  try {
+    return window.localStorage.getItem(key)
+  } catch {
+    return null
+  }
+}
+
+const setLocalStorageValue = (key: string, value: string) => {
+  try {
+    window.localStorage.setItem(key, value)
+  } catch {}
+}
+
+const getSessionStorageValue = (key: string) => {
+  try {
+    return window.sessionStorage.getItem(key)
+  } catch {
+    return null
+  }
+}
+
+const setSessionStorageValue = (key: string, value: string) => {
+  try {
+    window.sessionStorage.setItem(key, value)
+  } catch {}
+}
+
+const removeSessionStorageValue = (key: string) => {
+  try {
+    window.sessionStorage.removeItem(key)
+  } catch {}
+}
+
 const toRadians = (value: number) => (value * Math.PI) / 180
 
 const getDistance = (
@@ -213,7 +247,7 @@ export default function Navbar() {
   }, [])
 
   useEffect(() => {
-    const savedLocation = window.localStorage.getItem(selectedLocationKey)
+    const savedLocation = getLocalStorageValue(selectedLocationKey)
 
     if (savedLocation) {
       setLocation(savedLocation)
@@ -229,13 +263,13 @@ export default function Navbar() {
 
   useEffect(() => {
     if (location !== "Detecting...") {
-      window.localStorage.setItem(selectedLocationKey, location)
+      setLocalStorageValue(selectedLocationKey, location)
       window.dispatchEvent(new Event(selectedLocationEvent))
     }
   }, [location])
 
   useEffect(() => {
-    if (window.sessionStorage.getItem(sidebarOpenKey) === "true" && !isSimpleNavbarPage) {
+    if (getSessionStorageValue(sidebarOpenKey) === "true" && !isSimpleNavbarPage) {
       setShowSidebar(true)
     }
   }, [isSimpleNavbarPage])
@@ -251,7 +285,7 @@ export default function Navbar() {
     : notifications[0]?.id || ""
 
   useEffect(() => {
-    const savedProfilePhoto = window.localStorage.getItem(profilePhotoKey)
+    const savedProfilePhoto = getLocalStorageValue(profilePhotoKey)
 
     if (savedProfilePhoto) {
       setProfilePhoto(savedProfilePhoto)
@@ -274,7 +308,7 @@ export default function Navbar() {
         setProfileEmail(session?.user.email || "")
 
         if (!session) {
-          window.sessionStorage.removeItem(loginHandledKey)
+          removeSessionStorageValue(loginHandledKey)
         }
       }
     }
@@ -295,9 +329,9 @@ export default function Navbar() {
 
         if (event === "SIGNED_IN" && session) {
           const hasLoggedInBefore =
-            window.localStorage.getItem(hasLoggedInBeforeKey) === "true"
+            getLocalStorageValue(hasLoggedInBeforeKey) === "true"
           const alreadyHandledInSession =
-            window.sessionStorage.getItem(loginHandledKey) === "true"
+            getSessionStorageValue(loginHandledKey) === "true"
 
           if (!alreadyHandledInSession) {
             const nextNotification = pushNotification({
@@ -309,13 +343,13 @@ export default function Navbar() {
               source: "auth",
             })
             setActiveNotificationId(nextNotification.id)
-            window.localStorage.setItem(hasLoggedInBeforeKey, "true")
-            window.sessionStorage.setItem(loginHandledKey, "true")
+            setLocalStorageValue(hasLoggedInBeforeKey, "true")
+            setSessionStorageValue(loginHandledKey, "true")
           }
         }
 
         if (event === "SIGNED_OUT") {
-          window.sessionStorage.removeItem(loginHandledKey)
+          removeSessionStorageValue(loginHandledKey)
         }
       }
     )
@@ -343,7 +377,7 @@ export default function Navbar() {
       }
 
       setProfilePhoto(imageUrl)
-      window.localStorage.setItem(profilePhotoKey, imageUrl)
+      setLocalStorageValue(profilePhotoKey, imageUrl)
     }
 
     reader.readAsDataURL(file)
@@ -365,8 +399,8 @@ export default function Navbar() {
   }
 
   const handleLogout = async () => {
-    window.sessionStorage.removeItem(sidebarOpenKey)
-    window.sessionStorage.removeItem(loginHandledKey)
+    removeSessionStorageValue(sidebarOpenKey)
+    removeSessionStorageValue(loginHandledKey)
     await supabase.auth.signOut()
     setShowSidebar(false)
     router.push("/")
@@ -428,7 +462,7 @@ export default function Navbar() {
             <div
               style={sidebarBackdrop}
               onClick={() => {
-                window.sessionStorage.removeItem(sidebarOpenKey)
+                removeSessionStorageValue(sidebarOpenKey)
                 setShowSidebar(false)
               }}
             />
@@ -439,7 +473,7 @@ export default function Navbar() {
               <button
                 type="button"
                 onClick={() => {
-                  window.sessionStorage.removeItem(sidebarOpenKey)
+                  removeSessionStorageValue(sidebarOpenKey)
                   setShowSidebar(false)
                 }}
                 style={sidebarCloseStyle}
@@ -499,11 +533,11 @@ export default function Navbar() {
                   href={link.href}
                   onClick={() => {
                     if (link.href === "/profile") {
-                      window.sessionStorage.setItem(sidebarOpenKey, "true")
+                      setSessionStorageValue(sidebarOpenKey, "true")
                       return
                     }
 
-                    window.sessionStorage.removeItem(sidebarOpenKey)
+                    removeSessionStorageValue(sidebarOpenKey)
                     if (link.href !== "/profile") {
                       setShowSidebar(false)
                     }

@@ -19,6 +19,50 @@ let notificationsChannel: BroadcastChannel | null = null
 
 const canUseWindow = () => typeof window !== "undefined"
 
+const safeLocalStorageGet = (key: string) => {
+  if (!canUseWindow()) {
+    return null
+  }
+
+  try {
+    return window.localStorage.getItem(key)
+  } catch {
+    return null
+  }
+}
+
+const safeLocalStorageSet = (key: string, value: string) => {
+  if (!canUseWindow()) {
+    return
+  }
+
+  try {
+    window.localStorage.setItem(key, value)
+  } catch {}
+}
+
+const safeSessionStorageGet = (key: string) => {
+  if (!canUseWindow()) {
+    return null
+  }
+
+  try {
+    return window.sessionStorage.getItem(key)
+  } catch {
+    return null
+  }
+}
+
+const safeSessionStorageSet = (key: string, value: string) => {
+  if (!canUseWindow()) {
+    return
+  }
+
+  try {
+    window.sessionStorage.setItem(key, value)
+  } catch {}
+}
+
 const getBroadcastChannel = () => {
   if (!canUseWindow() || typeof BroadcastChannel === "undefined") {
     return null
@@ -45,7 +89,7 @@ const readNotifications = () => {
     return [] as AppNotification[]
   }
 
-  const storedNotifications = window.localStorage.getItem(notificationsStorageKey)
+  const storedNotifications = safeLocalStorageGet(notificationsStorageKey)
 
   if (!storedNotifications) {
     return []
@@ -64,10 +108,7 @@ const writeNotifications = (notifications: AppNotification[]) => {
     return
   }
 
-  window.localStorage.setItem(
-    notificationsStorageKey,
-    JSON.stringify(notifications)
-  )
+  safeLocalStorageSet(notificationsStorageKey, JSON.stringify(notifications))
   dispatchNotificationsChanged()
 }
 
@@ -89,12 +130,12 @@ export const seedNotifications = () => {
     return
   }
 
-  if (window.sessionStorage.getItem(seededNotificationsKey) === "true") {
+  if (safeSessionStorageGet(seededNotificationsKey) === "true") {
     return
   }
 
   if (readNotifications().length > 0) {
-    window.sessionStorage.setItem(seededNotificationsKey, "true")
+    safeSessionStorageSet(seededNotificationsKey, "true")
     return
   }
 
@@ -121,7 +162,7 @@ export const seedNotifications = () => {
   ]
 
   writeNotifications(seededNotifications)
-  window.sessionStorage.setItem(seededNotificationsKey, "true")
+  safeSessionStorageSet(seededNotificationsKey, "true")
 }
 
 export const pushNotification = (
