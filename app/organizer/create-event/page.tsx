@@ -232,25 +232,27 @@ const pageStyle = {
   minHeight: "calc(100vh - 55px)",
   height: "calc(100vh - 55px)",
   padding: "16px 20px 14px",
-  backgroundImage:
-    "linear-gradient(rgba(34, 22, 16, 0.26), rgba(34, 22, 16, 0.26)), url('/univa-create-event.png')",
-  backgroundSize: "cover",
-  backgroundPosition: "center",
-  backgroundRepeat: "no-repeat",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  background: "#f3e9e1",
   overflow: "hidden" as const,
 }
 
 const cardStyle = {
-  maxWidth: "980px",
-  margin: "0 auto",
-  padding: "18px",
-  borderRadius: "20px",
-  background: "transparent",
-  boxShadow: "none",
-  backdropFilter: "none",
-  border: "none",
-  maxHeight: "calc(100vh - 87px)",
+  width: "min(100%, 980px)",
+  height: "min(calc(100vh - 95px), 760px)",
+  padding: "22px",
+  borderRadius: "24px",
+  backgroundImage:
+    "linear-gradient(rgba(34, 22, 16, 0.34), rgba(34, 22, 16, 0.34)), url('/univa-create-event.png')",
+  backgroundSize: "cover",
+  backgroundPosition: "center",
+  backgroundRepeat: "no-repeat",
+  boxShadow: "0 22px 44px rgba(30,18,12,0.2)",
   overflow: "hidden" as const,
+  display: "flex",
+  flexDirection: "column" as const,
 }
 
 const headerStyle = {
@@ -258,7 +260,7 @@ const headerStyle = {
   alignItems: "center",
   justifyContent: "space-between",
   gap: "16px",
-  marginBottom: "12px",
+  marginBottom: "16px",
 }
 
 const titleStyle = {
@@ -279,6 +281,8 @@ const formStyle = {
   display: "grid",
   gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
   gap: "10px 14px",
+  flex: 1,
+  alignContent: "start",
 }
 
 const fieldWrapperStyle = {
