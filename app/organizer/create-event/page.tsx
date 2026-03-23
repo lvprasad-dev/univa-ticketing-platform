@@ -78,7 +78,6 @@ export default function CreateEventPage() {
 
   return (
     <main style={pageStyle}>
-      <div style={pageOverlayStyle} />
       <section style={cardStyle}>
         <div style={headerStyle}>
           <div>
@@ -229,34 +228,24 @@ export default function CreateEventPage() {
 }
 
 const pageStyle = {
-  position: "relative" as const,
   marginTop: "55px",
   minHeight: "100vh",
-  padding: "40px 32px",
+  padding: "24px 24px 20px",
   backgroundImage:
-    "linear-gradient(rgba(34, 22, 16, 0.38), rgba(34, 22, 16, 0.38)), url('/univa-create-event.png')",
+    "linear-gradient(rgba(34, 22, 16, 0.26), rgba(34, 22, 16, 0.26)), url('/univa-create-event.png')",
   backgroundSize: "cover",
   backgroundPosition: "center",
   backgroundRepeat: "no-repeat",
 }
 
-const pageOverlayStyle = {
-  position: "absolute" as const,
-  inset: 0,
-  background:
-    "linear-gradient(180deg, rgba(255, 248, 242, 0.08), rgba(255, 248, 242, 0.24))",
-  pointerEvents: "none" as const,
-}
-
 const cardStyle = {
-  position: "relative" as const,
-  maxWidth: "920px",
+  maxWidth: "980px",
   margin: "0 auto",
-  padding: "28px",
-  borderRadius: "22px",
-  background: "rgba(255,255,255,0.94)",
-  boxShadow: "0 20px 38px rgba(30,18,12,0.18)",
-  backdropFilter: "blur(6px)",
+  padding: "22px",
+  borderRadius: "20px",
+  background: "rgba(255,255,255,0.88)",
+  boxShadow: "0 18px 34px rgba(30,18,12,0.16)",
+  backdropFilter: "blur(4px)",
 }
 
 const headerStyle = {
@@ -264,57 +253,61 @@ const headerStyle = {
   alignItems: "center",
   justifyContent: "space-between",
   gap: "16px",
-  marginBottom: "24px",
+  marginBottom: "18px",
 }
 
 const titleStyle = {
-  marginBottom: "10px",
+  margin: "0 0 8px",
   color: "#3d2419",
+  fontSize: "32px",
 }
 
 const textStyle = {
   margin: 0,
   color: "#785344",
+  fontSize: "14px",
 }
 
 const formStyle = {
   display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-  gap: "18px",
+  gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+  gap: "14px 16px",
 }
 
 const fieldWrapperStyle = {
   display: "grid",
-  gap: "8px",
+  gap: "6px",
 }
 
 const fullWidthFieldStyle = {
   display: "grid",
-  gap: "8px",
+  gap: "6px",
   gridColumn: "1 / -1",
 }
 
 const labelStyle = {
   color: "#5f4032",
   fontWeight: "700",
+  fontSize: "13px",
 }
 
 const helperTextStyle = {
-  marginTop: "-2px",
+  marginTop: "0",
   color: "#8a6a5c",
   fontSize: "12px",
 }
 
 const inputStyle = {
   width: "100%",
-  padding: "14px 16px",
-  borderRadius: "14px",
+  padding: "12px 14px",
+  borderRadius: "12px",
   border: "1px solid #f0c7b2",
-  background: "#fffaf7",
+  background: "rgba(255,250,247,0.96)",
 }
 
 const textareaStyle = {
   ...inputStyle,
+  minHeight: "92px",
   resize: "vertical" as const,
 }
 
@@ -324,12 +317,13 @@ const actionsStyle = {
   alignItems: "center",
   gap: "14px",
   flexWrap: "wrap" as const,
+  justifyContent: "flex-end",
 }
 
 const submitButtonStyle = {
   border: "none",
-  padding: "12px 18px",
-  borderRadius: "14px",
+  padding: "12px 20px",
+  borderRadius: "12px",
   background: "#ff7a00",
   color: "white",
   fontWeight: "700",
