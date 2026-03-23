@@ -78,6 +78,7 @@ export default function CreateEventPage() {
 
   return (
     <main style={pageStyle}>
+      <div style={pageOverlayStyle} />
       <section style={cardStyle}>
         <div style={headerStyle}>
           <div>
@@ -228,19 +229,34 @@ export default function CreateEventPage() {
 }
 
 const pageStyle = {
+  position: "relative" as const,
   marginTop: "55px",
   minHeight: "100vh",
   padding: "40px 32px",
-  background: "#fff8f2",
+  backgroundImage:
+    "linear-gradient(rgba(34, 22, 16, 0.38), rgba(34, 22, 16, 0.38)), url('/univa-create-event.png')",
+  backgroundSize: "cover",
+  backgroundPosition: "center",
+  backgroundRepeat: "no-repeat",
+}
+
+const pageOverlayStyle = {
+  position: "absolute" as const,
+  inset: 0,
+  background:
+    "linear-gradient(180deg, rgba(255, 248, 242, 0.08), rgba(255, 248, 242, 0.24))",
+  pointerEvents: "none" as const,
 }
 
 const cardStyle = {
+  position: "relative" as const,
   maxWidth: "920px",
   margin: "0 auto",
   padding: "28px",
   borderRadius: "22px",
-  background: "white",
-  boxShadow: "0 18px 36px rgba(150,92,52,0.08)",
+  background: "rgba(255,255,255,0.94)",
+  boxShadow: "0 20px 38px rgba(30,18,12,0.18)",
+  backdropFilter: "blur(6px)",
 }
 
 const headerStyle = {
