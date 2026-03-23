@@ -241,9 +241,9 @@ const pageStyle = {
 }
 
 const cardStyle = {
-  width: "min(100%, 980px)",
-  height: "min(calc(100vh - 95px), 760px)",
-  margin: "0 auto",
+  width: "100%",
+  height: "100%",
+  margin: 0,
   padding: "22px 18px",
   borderRadius: "0",
   background: "transparent",
