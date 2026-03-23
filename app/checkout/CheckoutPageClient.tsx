@@ -86,8 +86,9 @@ export default function CheckoutPageClient() {
   }
 
   const ticketSubtotal = resolvedEvent.price * quantity
-  const platformFee = PLATFORM_FEE
+  const platformFee = resolvedEvent.price > 0 ? PLATFORM_FEE : 0
   const totalAmount = ticketSubtotal + platformFee
+  const isFreeEvent = resolvedEvent.price === 0
 
   const handleBooking = async () => {
     setErrorMessage("")
@@ -153,8 +154,10 @@ export default function CheckoutPageClient() {
     }
 
     pushNotification({
-      title: "Booking Confirmed",
-      message: `${event.title} booking is confirmed for ${quantity} ticket(s) at ${event.venue}, ${event.city}. Event time: ${new Date(event.event_date).toLocaleString()}. Total paid: Rs.${totalAmount}.`,
+      title: isFreeEvent ? "Free Ticket Confirmed" : "Booking Confirmed",
+      message: `${event.title} booking is confirmed for ${quantity} ticket(s) at ${event.venue}, ${event.city}. Event time: ${new Date(event.event_date).toLocaleString()}. ${
+        isFreeEvent ? "No payment was required." : `Total paid: Rs.${totalAmount}.`
+      }`,
       href: "/my-tickets",
       source: "bookings",
     })
@@ -233,7 +236,7 @@ export default function CheckoutPageClient() {
               <div style={fareBoxStyle}>
                 <div style={rowStyle}>
                   <span>Ticket price</span>
-                  <strong>Rs.{resolvedEvent.price}</strong>
+                  <strong>{isFreeEvent ? "Free" : `Rs.${resolvedEvent.price}`}</strong>
                 </div>
                 <div style={rowStyle}>
                   <span>Quantity</span>
@@ -241,15 +244,15 @@ export default function CheckoutPageClient() {
                 </div>
                 <div style={rowStyle}>
                   <span>Subtotal</span>
-                  <strong>Rs.{ticketSubtotal}</strong>
+                  <strong>{isFreeEvent ? "Free" : `Rs.${ticketSubtotal}`}</strong>
                 </div>
                 <div style={rowStyle}>
                   <span>Platform fee</span>
-                  <strong>Rs.{platformFee}</strong>
+                  <strong>{platformFee === 0 ? "Rs.0" : `Rs.${platformFee}`}</strong>
                 </div>
                 <div style={totalRowStyle}>
                   <span>Total amount</span>
-                  <strong>Rs.{totalAmount}</strong>
+                  <strong>{totalAmount === 0 ? "Free" : `Rs.${totalAmount}`}</strong>
                 </div>
               </div>
 
@@ -260,12 +263,16 @@ export default function CheckoutPageClient() {
                 style={submitButtonStyle}
               >
                 {isSubmitting
-                  ? "Booking..."
+                  ? isFreeEvent
+                    ? "Creating Free Ticket..."
+                    : "Booking..."
                   : !isLiveEvent
                     ? "Live Booking Unavailable"
                     : resolvedEvent.available_tickets === 0
                       ? "Sold Out"
-                      : "Confirm Booking"}
+                      : isFreeEvent
+                        ? "Get Free Ticket"
+                        : "Confirm Booking"}
               </button>
             </section>
           </div>

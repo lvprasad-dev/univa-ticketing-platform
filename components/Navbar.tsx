@@ -52,6 +52,7 @@ const sidebarOpenKey = "univa-sidebar-open"
 const selectedLocationKey = "univa-selected-location"
 const selectedLocationEvent = "univa-location-change"
 const hasLoggedInBeforeKey = "univa-has-logged-in-before"
+const lastLoginDayKey = "univa-last-login-day"
 const loginHandledKey = "univa-login-handled"
 const lastAuthNotificationKey = "univa-last-auth-notification"
 const inactivityTimeoutMs = 30 * 60 * 1000
@@ -171,6 +172,15 @@ const formatLocationLabel = (address?: LocationAddress) => {
   }
 
   return city || area || null
+}
+
+const getLocalDayKey = () => {
+  const currentDate = new Date()
+  const year = currentDate.getFullYear()
+  const month = String(currentDate.getMonth() + 1).padStart(2, "0")
+  const day = String(currentDate.getDate()).padStart(2, "0")
+
+  return `${year}-${month}-${day}`
 }
 
 export default function Navbar() {
@@ -327,6 +337,9 @@ export default function Navbar() {
         if (event === "SIGNED_IN" && session) {
           const hasLoggedInBefore =
             getLocalStorageValue(hasLoggedInBeforeKey) === "true"
+          const lastLoginDay = getLocalStorageValue(lastLoginDayKey)
+          const currentLoginDay = getLocalDayKey()
+          const isFirstLoginToday = lastLoginDay !== currentLoginDay
           const alreadyHandledInSession =
             getSessionStorageValue(loginHandledKey) === "true"
           const currentAuthMarker = `${session.user.id}:${session.access_token.slice(-12)}`
@@ -335,17 +348,23 @@ export default function Navbar() {
           if (!alreadyHandledInSession && lastAuthMarker !== currentAuthMarker) {
             const nextNotification = pushNotification({
               title: `Hello ${resolvedName}!`,
-              message: hasLoggedInBefore
-                ? `Welcome back, ${resolvedName}! Continue where you left off.`
-                : `Welcome to UNIVA, ${resolvedName}! Your account is ready to explore events.`,
+              message: !hasLoggedInBefore || isFirstLoginToday
+                ? `Welcome to UNIVA, ${resolvedName}! Your account is ready to explore events.`
+                : `Welcome back, ${resolvedName}! Continue where you left off.`,
               href: "/profile",
               source: "auth",
             })
             setActiveNotificationId(nextNotification.id)
             setLocalStorageValue(hasLoggedInBeforeKey, "true")
+            setLocalStorageValue(lastLoginDayKey, currentLoginDay)
             setSessionStorageValue(loginHandledKey, "true")
             setSessionStorageValue(lastAuthNotificationKey, currentAuthMarker)
           }
+        }
+
+        if (event === "TOKEN_REFRESHED" && session) {
+          setIsLoggedIn(Boolean(session))
+          setProfileEmail(session?.user.email || "")
         }
 
         if (event === "SIGNED_OUT") {
