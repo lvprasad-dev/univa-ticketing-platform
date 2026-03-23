@@ -229,23 +229,27 @@ export default function CreateEventPage() {
 
 const pageStyle = {
   marginTop: "55px",
-  minHeight: "100vh",
-  padding: "24px 24px 20px",
+  minHeight: "calc(100vh - 55px)",
+  height: "calc(100vh - 55px)",
+  padding: "16px 20px 14px",
   backgroundImage:
     "linear-gradient(rgba(34, 22, 16, 0.26), rgba(34, 22, 16, 0.26)), url('/univa-create-event.png')",
   backgroundSize: "cover",
   backgroundPosition: "center",
   backgroundRepeat: "no-repeat",
+  overflow: "hidden" as const,
 }
 
 const cardStyle = {
   maxWidth: "980px",
   margin: "0 auto",
-  padding: "22px",
-  borderRadius: "20px",
+  padding: "18px",
+  borderRadius: "18px",
   background: "rgba(255,255,255,0.88)",
   boxShadow: "0 18px 34px rgba(30,18,12,0.16)",
   backdropFilter: "blur(4px)",
+  maxHeight: "calc(100vh - 87px)",
+  overflow: "hidden" as const,
 }
 
 const headerStyle = {
@@ -253,25 +257,25 @@ const headerStyle = {
   alignItems: "center",
   justifyContent: "space-between",
   gap: "16px",
-  marginBottom: "18px",
+  marginBottom: "12px",
 }
 
 const titleStyle = {
-  margin: "0 0 8px",
+  margin: "0 0 4px",
   color: "#3d2419",
-  fontSize: "32px",
+  fontSize: "28px",
 }
 
 const textStyle = {
   margin: 0,
   color: "#785344",
-  fontSize: "14px",
+  fontSize: "13px",
 }
 
 const formStyle = {
   display: "grid",
   gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-  gap: "14px 16px",
+  gap: "10px 14px",
 }
 
 const fieldWrapperStyle = {
@@ -288,27 +292,29 @@ const fullWidthFieldStyle = {
 const labelStyle = {
   color: "#5f4032",
   fontWeight: "700",
-  fontSize: "13px",
+  fontSize: "12px",
 }
 
 const helperTextStyle = {
   marginTop: "0",
   color: "#8a6a5c",
-  fontSize: "12px",
+  fontSize: "11px",
 }
 
 const inputStyle = {
   width: "100%",
-  padding: "12px 14px",
-  borderRadius: "12px",
+  padding: "10px 12px",
+  borderRadius: "10px",
   border: "1px solid #f0c7b2",
   background: "rgba(255,250,247,0.96)",
+  fontSize: "13px",
 }
 
 const textareaStyle = {
   ...inputStyle,
-  minHeight: "92px",
-  resize: "vertical" as const,
+  minHeight: "68px",
+  maxHeight: "68px",
+  resize: "none" as const,
 }
 
 const actionsStyle = {
@@ -322,8 +328,8 @@ const actionsStyle = {
 
 const submitButtonStyle = {
   border: "none",
-  padding: "12px 20px",
-  borderRadius: "12px",
+  padding: "10px 18px",
+  borderRadius: "10px",
   background: "#ff7a00",
   color: "white",
   fontWeight: "700",
