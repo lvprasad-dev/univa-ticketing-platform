@@ -8,6 +8,13 @@ type LoginPageClientProps = {
   authMessage: string
 }
 
+const countryCodeOptions = [
+  { value: "+91", label: "+91 India" },
+  { value: "+1", label: "+1 USA" },
+  { value: "+44", label: "+44 UK" },
+  { value: "+971", label: "+971 UAE" },
+]
+
 export default function LoginPageClient({
   authMessage,
 }: LoginPageClientProps) {
@@ -235,16 +242,17 @@ export default function LoginPageClient({
         {loginType === "mobile" ? (
           <form onSubmit={mobileOtpSent ? handleVerifyMobileOtp : handleSendMobileOtp}>
             <div style={phoneRowStyle}>
-              <input
-                type="tel"
-                placeholder="+91"
+              <select
                 value={countryCode}
                 onChange={(event) => setCountryCode(event.target.value)}
-                autoComplete="tel-country-code"
-                inputMode="tel"
                 style={countryCodeInputStyle}
-                required
-              />
+              >
+                {countryCodeOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
 
               <input
                 type="tel"
