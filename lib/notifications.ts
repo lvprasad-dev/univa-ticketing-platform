@@ -153,30 +153,6 @@ export const seedNotifications = () => {
     safeSessionStorageSet(seededNotificationsKey, "true")
     return
   }
-
-  const now = Date.now()
-  const seededNotifications: AppNotification[] = [
-    {
-      id: `seed-${now}`,
-      title: "Welcome to UNIVA",
-      message: "Your account is ready. Explore events, travel, and creator tools from one place.",
-      createdAt: new Date(now).toISOString(),
-      isRead: false,
-      href: "/",
-      source: "system",
-    },
-    {
-      id: `seed-${now + 1}`,
-      title: "Explore Categories",
-      message: "Browse movies, travel, darshan, conferences, and festivals near your location.",
-      createdAt: new Date(now + 1).toISOString(),
-      isRead: false,
-      href: "/movies",
-      source: "system",
-    },
-  ]
-
-  writeNotifications(seededNotifications)
   safeSessionStorageSet(seededNotificationsKey, "true")
 }
 
@@ -193,6 +169,10 @@ export const pushNotification = (
 
   writeNotifications([nextNotification, ...notifications].slice(0, 50))
   return nextNotification
+}
+
+export const clearAllNotifications = () => {
+  writeNotifications([])
 }
 
 export const markAllNotificationsRead = () => {

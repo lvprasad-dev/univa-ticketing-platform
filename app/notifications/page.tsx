@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useSyncExternalStore } from "react"
 import {
+  clearAllNotifications,
   getNotificationHeading,
   getNotifications,
   markAllNotificationsRead,
@@ -18,6 +19,7 @@ export default function NotificationsPage() {
 
   useEffect(() => {
     markAllNotificationsRead()
+    clearAllNotifications()
   }, [])
 
   const resolvedActiveId = notifications.some((notification) => notification.id === activeId)
