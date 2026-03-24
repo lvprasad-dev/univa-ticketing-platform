@@ -31,8 +31,7 @@ export default function NotificationsPage() {
       style={{
         minHeight: "100vh",
         padding: "96px 24px 32px",
-        background:
-          "radial-gradient(circle at top left, rgba(108,99,255,0.18), transparent 38%), radial-gradient(circle at top right, rgba(255,122,0,0.18), transparent 34%), #f8f7ff",
+        background: "#ffffff",
         display: "flex",
         justifyContent: "flex-end",
       }}
@@ -42,9 +41,8 @@ export default function NotificationsPage() {
           width: "min(460px, 100%)",
           padding: "32px",
           borderRadius: "24px",
-          background: "rgba(255,255,255,0.94)",
-          boxShadow: "-18px 20px 40px rgba(58, 40, 110, 0.10)",
-          border: "1px solid #ece7fb",
+          background: "#ffffff",
+          border: "1px solid #f0f0f0",
         }}
       >
         <p
@@ -63,23 +61,21 @@ export default function NotificationsPage() {
           style={{
             margin: "0 0 16px",
             color: "#221a3c",
-            fontSize: "28px",
+            fontSize: "24px",
             lineHeight: 1.2,
           }}
         >
-          Hello user, welcome to UNIVA.
+          Notifications
         </h1>
         <p
           style={{
             margin: "0 0 22px",
             color: "#5b5476",
-            fontSize: "16px",
+            fontSize: "15px",
             lineHeight: 1.7,
           }}
         >
-          Every important update appears here first. Open any notification below
-          to read the full information and keep track of what is happening inside
-          UNIVA.
+          Updates will appear here when they are available.
         </p>
 
         <div style={{ display: "grid", gap: "12px" }}>
