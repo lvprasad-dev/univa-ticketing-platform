@@ -57,16 +57,6 @@ export default function NotificationsPage() {
         >
           Notifications
         </p>
-        <h1
-          style={{
-            margin: "0 0 16px",
-            color: "#221a3c",
-            fontSize: "24px",
-            lineHeight: 1.2,
-          }}
-        >
-          Notifications
-        </h1>
         <p
           style={{
             margin: "0 0 22px",
