@@ -14,6 +14,7 @@ import {
 } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import {
+  clearAllNotifications,
   getNotificationHeading,
   getNotifications,
   getUnreadNotificationCount,
@@ -283,6 +284,10 @@ export default function Navbar() {
       setShowSidebar(true)
     }
   }, [isSimpleNavbarPage])
+
+  useEffect(() => {
+    clearAllNotifications()
+  }, [])
 
   const resolvedActiveNotificationId = notifications.some(
     (notification) => notification.id === activeNotificationId
