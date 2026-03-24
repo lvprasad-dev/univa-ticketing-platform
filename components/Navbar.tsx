@@ -790,10 +790,7 @@ export default function Navbar() {
       {showNotificationsPanel && !isSimpleNavbarPage && (
         <aside style={notificationsDrawerStyle}>
           <div style={notificationsDrawerHeaderStyle}>
-            <div>
-              <p style={notificationsEyebrowStyle}>Notifications</p>
-              <h2 style={notificationsTitleStyle}>Hello user, welcome to UNIVA.</h2>
-            </div>
+            <p style={notificationsEyebrowStyle}>Notifications</p>
             <button
               type="button"
               onClick={() => setShowNotificationsPanel(false)}
@@ -802,11 +799,6 @@ export default function Navbar() {
               x
             </button>
           </div>
-
-          <p style={notificationsIntroStyle}>
-            Every important update appears here first. Open any notification below
-            to read the full information without leaving your current page.
-          </p>
 
           <div style={notificationsListStyle}>
             {notifications.length > 0 ? (
@@ -1061,21 +1053,21 @@ const notificationsDrawerStyle = {
   overflowY: "auto" as const,
   padding: "24px",
   borderRadius: "24px",
-  background: "rgba(255,255,255,0.97)",
-  boxShadow: "-18px 20px 40px rgba(58, 40, 110, 0.14)",
-  border: "1px solid #ece7fb",
+  background: "#ffffff",
+  border: "1px solid #f0f0f0",
   zIndex: 1200,
 }
 
 const notificationsDrawerHeaderStyle = {
   display: "flex",
-  alignItems: "flex-start",
+  alignItems: "center",
   justifyContent: "space-between",
   gap: "16px",
+  marginBottom: "18px",
 }
 
 const notificationsEyebrowStyle = {
-  margin: "0 0 10px",
+  margin: 0,
   color: "#ff7a00",
   fontSize: "14px",
   fontWeight: "700",
@@ -1083,28 +1075,15 @@ const notificationsEyebrowStyle = {
   textTransform: "uppercase" as const,
 }
 
-const notificationsTitleStyle = {
-  margin: 0,
-  color: "#221a3c",
-  fontSize: "28px",
-  lineHeight: 1.2,
-}
-
 const notificationsCloseStyle = {
   border: "none",
-  background: "#f6f1ff",
+  background: "#ffffff",
   width: "34px",
   height: "34px",
   borderRadius: "999px",
   cursor: "pointer",
   color: "#241c3e",
-}
-
-const notificationsIntroStyle = {
-  margin: "16px 0 22px",
-  color: "#5b5476",
-  fontSize: "16px",
-  lineHeight: 1.7,
+  border: "1px solid #f0f0f0",
 }
 
 const notificationsListStyle = {
