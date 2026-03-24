@@ -89,7 +89,13 @@ export default function LoginPageClient({
       return "Enter your mobile number."
     }
 
-    const digits = normalizedPhone.replace(/^\+\d{1,3}/, "")
+    const normalizedDialCode = dialCode.trim().startsWith("+")
+      ? `+${dialCode.trim().slice(1).replace(/\D/g, "")}`
+      : `+${dialCode.trim().replace(/\D/g, "")}`
+
+    const digits = normalizedPhone.startsWith(normalizedDialCode)
+      ? normalizedPhone.slice(normalizedDialCode.length)
+      : normalizedPhone.replace(/^\+\d+/, "")
 
     if (!digits) {
       return "Enter your mobile number."
