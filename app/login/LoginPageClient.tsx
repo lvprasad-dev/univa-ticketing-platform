@@ -12,6 +12,7 @@ export default function LoginPageClient({
   authMessage,
 }: LoginPageClientProps) {
   const [loginType, setLoginType] = useState<"mobile" | "email">("mobile")
+  const [countryCode, setCountryCode] = useState("+91")
   const [email, setEmail] = useState("")
   const [emailOtp, setEmailOtp] = useState("")
   const [emailOtpSent, setEmailOtpSent] = useState(false)
@@ -28,29 +29,19 @@ export default function LoginPageClient({
   const router = useRouter()
   const statusMessage = message || authMessage
 
-  const normalizePhoneNumber = (value: string) => {
-    const trimmedValue = value.trim()
+  const normalizePhoneNumber = (dialCode: string, value: string) => {
+    const trimmedDialCode = dialCode.trim()
+    const trimmedValue = value.trim().replace(/\D/g, "")
 
-    if (!trimmedValue) {
+    if (!trimmedDialCode || !trimmedValue) {
       return null
     }
 
-    if (trimmedValue.startsWith("+")) {
-      const digitsOnly = `+${trimmedValue.slice(1).replace(/\D/g, "")}`
-      return digitsOnly.length > 1 ? digitsOnly : null
-    }
+    const normalizedDialCode = trimmedDialCode.startsWith("+")
+      ? `+${trimmedDialCode.slice(1).replace(/\D/g, "")}`
+      : `+${trimmedDialCode.replace(/\D/g, "")}`
 
-    const digitsOnly = trimmedValue.replace(/\D/g, "")
-
-    if (digitsOnly.length === 10) {
-      return `+91${digitsOnly}`
-    }
-
-    if (digitsOnly.length === 12 && digitsOnly.startsWith("91")) {
-      return `+${digitsOnly}`
-    }
-
-    return null
+    return normalizedDialCode.length > 1 ? `${normalizedDialCode}${trimmedValue}` : null
   }
 
   const handleSendEmailOtp = async (event: FormEvent<HTMLFormElement>) => {
@@ -103,10 +94,10 @@ export default function LoginPageClient({
     event.preventDefault()
     setError("")
     setMessage("")
-    const normalizedPhone = normalizePhoneNumber(mobile)
+    const normalizedPhone = normalizePhoneNumber(countryCode, mobile)
 
     if (!normalizedPhone) {
-      setError("Enter a valid mobile number. Use 10 digits or include country code.")
+      setError("Enter a valid country code and mobile number.")
       return
     }
 
@@ -131,10 +122,10 @@ export default function LoginPageClient({
     event.preventDefault()
     setError("")
     setMessage("")
-    const normalizedPhone = normalizePhoneNumber(mobile)
+    const normalizedPhone = normalizePhoneNumber(countryCode, mobile)
 
     if (!normalizedPhone) {
-      setError("Enter a valid mobile number. Use 10 digits or include country code.")
+      setError("Enter a valid country code and mobile number.")
       return
     }
 
@@ -243,16 +234,29 @@ export default function LoginPageClient({
 
         {loginType === "mobile" ? (
           <form onSubmit={mobileOtpSent ? handleVerifyMobileOtp : handleSendMobileOtp}>
-            <input
-              type="tel"
-              placeholder="Enter mobile number"
-              value={mobile}
-              onChange={(event) => setMobile(event.target.value)}
-              autoComplete="tel"
-              inputMode="tel"
-              style={input}
-              required
-            />
+            <div style={phoneRowStyle}>
+              <input
+                type="tel"
+                placeholder="+91"
+                value={countryCode}
+                onChange={(event) => setCountryCode(event.target.value)}
+                autoComplete="tel-country-code"
+                inputMode="tel"
+                style={countryCodeInputStyle}
+                required
+              />
+
+              <input
+                type="tel"
+                placeholder="Enter 10-digit mobile number"
+                value={mobile}
+                onChange={(event) => setMobile(event.target.value.replace(/\D/g, "").slice(0, 10))}
+                autoComplete="tel-national"
+                inputMode="tel"
+                style={mobileInputStyle}
+                required
+              />
+            </div>
 
             {mobileOtpSent && (
               <input
@@ -267,7 +271,7 @@ export default function LoginPageClient({
             <p style={helperText}>
               {mobileOtpSent
                 ? "Enter the OTP sent to your mobile number."
-                : "We will send an OTP to your mobile number. 10-digit numbers are treated as +91."}
+                : "Enter your country code and 10-digit mobile number to receive an OTP."}
             </p>
 
             <button style={orangeSubmitBtn} disabled={loading || providerLoading !== null}>
@@ -420,6 +424,20 @@ const input = {
   marginBottom: "12px",
   borderRadius: "10px",
   border: "1px solid #d2cce3",
+}
+
+const phoneRowStyle = {
+  display: "grid",
+  gridTemplateColumns: "110px 1fr",
+  gap: "10px",
+}
+
+const countryCodeInputStyle = {
+  ...input,
+}
+
+const mobileInputStyle = {
+  ...input,
 }
 
 const orangeSubmitBtn = {
