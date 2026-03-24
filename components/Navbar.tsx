@@ -18,7 +18,6 @@ import {
   getNotifications,
   getUnreadNotificationCount,
   markAllNotificationsRead,
-  pushNotification,
   subscribeToNotifications,
   type AppNotification,
 } from "@/lib/notifications"
@@ -335,26 +334,13 @@ export default function Navbar() {
         setProfileEmail(session?.user.email || "")
 
         if (event === "SIGNED_IN" && session) {
-          const hasLoggedInBefore =
-            getLocalStorageValue(hasLoggedInBeforeKey) === "true"
-          const lastLoginDay = getLocalStorageValue(lastLoginDayKey)
           const currentLoginDay = getLocalDayKey()
-          const isFirstLoginToday = lastLoginDay !== currentLoginDay
           const alreadyHandledInSession =
             getSessionStorageValue(loginHandledKey) === "true"
           const currentAuthMarker = `${session.user.id}:${session.access_token.slice(-12)}`
           const lastAuthMarker = getSessionStorageValue(lastAuthNotificationKey)
 
           if (!alreadyHandledInSession && lastAuthMarker !== currentAuthMarker) {
-            const nextNotification = pushNotification({
-              title: `Hello ${resolvedName}!`,
-              message: !hasLoggedInBefore || isFirstLoginToday
-                ? `Welcome to UNIVA, ${resolvedName}! Your account is ready to explore events.`
-                : `Welcome back, ${resolvedName}! Continue where you left off.`,
-              href: "/profile",
-              source: "auth",
-            })
-            setActiveNotificationId(nextNotification.id)
             setLocalStorageValue(hasLoggedInBeforeKey, "true")
             setLocalStorageValue(lastLoginDayKey, currentLoginDay)
             setSessionStorageValue(loginHandledKey, "true")
