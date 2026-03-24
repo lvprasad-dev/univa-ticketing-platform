@@ -38,10 +38,41 @@ export default function LoginPageClient({
 
   const normalizePhoneNumber = (dialCode: string, value: string) => {
     const trimmedDialCode = dialCode.trim()
-    const trimmedValue = value.trim().replace(/\D/g, "")
+    let trimmedValue = value.trim().replace(/\D/g, "")
 
     if (!trimmedDialCode || !trimmedValue) {
       return null
+    }
+
+    if (dialCode === "+91") {
+      if (trimmedValue.length === 11 && trimmedValue.startsWith("0")) {
+        trimmedValue = trimmedValue.slice(1)
+      }
+      if (trimmedValue.length === 12 && trimmedValue.startsWith("91")) {
+        trimmedValue = trimmedValue.slice(2)
+      }
+    }
+
+    if (dialCode === "+1" && trimmedValue.length === 11 && trimmedValue.startsWith("1")) {
+      trimmedValue = trimmedValue.slice(1)
+    }
+
+    if (dialCode === "+44") {
+      if (trimmedValue.startsWith("0")) {
+        trimmedValue = trimmedValue.slice(1)
+      }
+      if (trimmedValue.startsWith("44")) {
+        trimmedValue = trimmedValue.slice(2)
+      }
+    }
+
+    if (dialCode === "+971") {
+      if (trimmedValue.startsWith("0")) {
+        trimmedValue = trimmedValue.slice(1)
+      }
+      if (trimmedValue.startsWith("971")) {
+        trimmedValue = trimmedValue.slice(3)
+      }
     }
 
     const normalizedDialCode = trimmedDialCode.startsWith("+")
@@ -49,6 +80,36 @@ export default function LoginPageClient({
       : `+${trimmedDialCode.replace(/\D/g, "")}`
 
     return normalizedDialCode.length > 1 ? `${normalizedDialCode}${trimmedValue}` : null
+  }
+
+  const validateMobileNumber = (dialCode: string, value: string) => {
+    const normalizedPhone = normalizePhoneNumber(dialCode, value)
+
+    if (!normalizedPhone) {
+      return "Enter your mobile number."
+    }
+
+    const digits = normalizedPhone.replace(/^\+\d{1,3}/, "")
+
+    if (!digits) {
+      return "Enter your mobile number."
+    }
+
+    if (dialCode === "+91" || dialCode === "+1") {
+      if (digits.length !== 10) {
+        return "Enter a valid 10-digit mobile number."
+      }
+    } else if (dialCode === "+44") {
+      if (digits.length < 10 || digits.length > 11) {
+        return "Enter a valid UK mobile number."
+      }
+    } else if (dialCode === "+971") {
+      if (digits.length < 9 || digits.length > 10) {
+        return "Enter a valid UAE mobile number."
+      }
+    }
+
+    return null
   }
 
   const handleSendEmailOtp = async (event: FormEvent<HTMLFormElement>) => {
@@ -101,6 +162,13 @@ export default function LoginPageClient({
     event.preventDefault()
     setError("")
     setMessage("")
+    const mobileValidationError = validateMobileNumber(countryCode, mobile)
+
+    if (mobileValidationError) {
+      setError(mobileValidationError)
+      return
+    }
+
     const normalizedPhone = normalizePhoneNumber(countryCode, mobile)
 
     if (!normalizedPhone) {
@@ -122,13 +190,20 @@ export default function LoginPageClient({
     }
 
     setMobileOtpSent(true)
-    setMessage("OTP sent to your mobile number.")
+    setMessage(`OTP request sent to ${normalizedPhone}. If you do not receive it, check your SMS provider logs.`)
   }
 
   const handleVerifyMobileOtp = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setError("")
     setMessage("")
+    const mobileValidationError = validateMobileNumber(countryCode, mobile)
+
+    if (mobileValidationError) {
+      setError(mobileValidationError)
+      return
+    }
+
     const normalizedPhone = normalizePhoneNumber(countryCode, mobile)
 
     if (!normalizedPhone) {
