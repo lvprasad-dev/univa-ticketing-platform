@@ -233,8 +233,12 @@ const pageStyle = {
   marginTop: "72px",
   minHeight: "100vh",
   padding: "15px 32px 32px",
-  background: "#fff8f2",
+  backgroundImage: "url('/univa-my-events-bg.png')",
+  backgroundSize: "100% auto",
+  backgroundPosition: "center top",
+  backgroundRepeat: "no-repeat",
 }
+
 
 const tabBarWrapStyle = {
   maxWidth: "1120px",
@@ -248,9 +252,10 @@ const tabBarStyle = {
   padding: "8px 10px",
   minHeight: "15px",
   borderRadius: "18px",
-  background: "white",
+  background: "rgba(255,255,255,0.88)",
   boxShadow: "0 12px 24px rgba(150,92,52,0.08)",
 }
+
 
 const tabButtonStyle = {
   border: "none",
@@ -273,13 +278,14 @@ const headerCardStyle = {
   margin: "0 auto 24px",
   padding: "24px",
   borderRadius: "24px",
-  background: "white",
+  background: "rgba(255,255,255,0.88)",
   display: "flex",
   alignItems: "center",
   justifyContent: "space-between",
   gap: "16px",
   boxShadow: "0 18px 36px rgba(150,92,52,0.08)",
 }
+
 
 const subtitleStyle = {
   margin: 0,
@@ -313,12 +319,13 @@ const emptyStateStyle = {
   margin: "0 auto",
   padding: "28px",
   borderRadius: "24px",
-  background: "white",
+  background: "rgba(255,255,255,0.88)",
   boxShadow: "0 18px 36px rgba(150,92,52,0.08)",
   display: "grid",
   gap: "14px",
   justifyItems: "start",
 }
+
 
 const sectionsWrapStyle = {
   maxWidth: "1120px",
@@ -393,9 +400,10 @@ const gridStyle = {
 const cardStyle = {
   padding: "22px",
   borderRadius: "22px",
-  background: "white",
+  background: "rgba(255,255,255,0.88)",
   boxShadow: "0 18px 36px rgba(150,92,52,0.08)",
 }
+
 
 const badgeStyle = {
   display: "inline-block",
