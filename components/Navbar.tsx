@@ -1081,7 +1081,6 @@ const notificationsEyebrowStyle = {
 }
 
 const notificationsCloseStyle = {
-  border: "none",
   background: "#ffffff",
   width: "34px",
   height: "34px",
