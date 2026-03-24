@@ -242,28 +242,36 @@ export default function LoginPageClient({
         {loginType === "mobile" ? (
           <form onSubmit={mobileOtpSent ? handleVerifyMobileOtp : handleSendMobileOtp}>
             <div style={phoneRowStyle}>
-              <select
-                value={countryCode}
-                onChange={(event) => setCountryCode(event.target.value)}
-                style={countryCodeInputStyle}
-              >
-                {countryCodeOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+              <label style={fieldWrapStyle}>
+                <span style={fieldLabelStyle}>Country Code</span>
+                <select
+                  value={countryCode}
+                  onChange={(event) => setCountryCode(event.target.value)}
+                  style={countryCodeInputStyle}
+                >
+                  {countryCodeOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
 
-              <input
-                type="tel"
-                placeholder="Enter 10-digit mobile number"
-                value={mobile}
-                onChange={(event) => setMobile(event.target.value.replace(/\D/g, "").slice(0, 10))}
-                autoComplete="tel-national"
-                inputMode="tel"
-                style={mobileInputStyle}
-                required
-              />
+              <label style={fieldWrapStyle}>
+                <span style={fieldLabelStyle}>Mobile Number</span>
+                <input
+                  type="tel"
+                  placeholder="Enter 10-digit mobile number"
+                  value={mobile}
+                  onChange={(event) =>
+                    setMobile(event.target.value.replace(/\D/g, "").slice(0, 10))
+                  }
+                  autoComplete="tel-national"
+                  inputMode="tel"
+                  style={mobileInputStyle}
+                  required
+                />
+              </label>
             </div>
 
             {mobileOtpSent && (
@@ -440,8 +448,22 @@ const phoneRowStyle = {
   gap: "10px",
 }
 
+const fieldWrapStyle = {
+  display: "grid",
+  alignContent: "start",
+}
+
+const fieldLabelStyle = {
+  marginBottom: "6px",
+  fontSize: "12px",
+  color: "#625b79",
+  fontWeight: "600",
+}
+
 const countryCodeInputStyle = {
   ...input,
+  appearance: "auto" as const,
+  background: "#ffffff",
 }
 
 const mobileInputStyle = {
