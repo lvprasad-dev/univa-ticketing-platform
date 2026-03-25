@@ -374,8 +374,8 @@ const gridStyle = {
 const cardStyle = {
   padding: "22px",
   borderRadius: "24px",
-  background: "rgba(255, 255, 255, 0.9)",
-  boxShadow: "0 18px 36px rgba(37, 25, 77, 0.12)",
+  background: "rgba(207, 229, 255, 0.88)",
+  boxShadow: "0 18px 36px rgba(45, 88, 160, 0.18)",
   backdropFilter: "blur(4px)",
 }
 
@@ -386,7 +386,7 @@ const posterStyle = {
   justifyContent: "center",
   borderRadius: "20px",
   marginBottom: "18px",
-  background: "rgba(255, 255, 255, 0.72)",
+  background: "rgba(162, 203, 255, 0.82)",
 }
 
 const posterIconStyle = {
