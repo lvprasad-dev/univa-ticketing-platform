@@ -193,7 +193,7 @@ function EventSection({
       </div>
 
       {events.length === 0 ? (
-        <div style={emptySectionActionStyle}>
+        <div style={emptySectionCardStyle}>
           <p style={emptySectionTextStyle}>{emptyText}</p>
           {title === "Live" && (
             <Link href="/organizer/create-event" style={emptySectionButtonStyle}>
@@ -278,12 +278,12 @@ const headerCardStyle = {
   margin: "0 auto 24px",
   padding: "24px",
   borderRadius: "24px",
-  background: "transparent",
+  background: "rgba(255, 255, 255, 0.82)",
   display: "flex",
   alignItems: "center",
   justifyContent: "space-between",
   gap: "16px",
-  boxShadow: "none",
+  boxShadow: "0 18px 36px rgba(150,92,52,0.08)",
 }
 
 
@@ -319,8 +319,8 @@ const emptyStateStyle = {
   margin: "0 auto",
   padding: "28px",
   borderRadius: "24px",
-  background: "transparent",
-  boxShadow: "none",
+  background: "rgba(255, 255, 255, 0.82)",
+  boxShadow: "0 18px 36px rgba(150,92,52,0.08)",
   display: "grid",
   gap: "14px",
   justifyItems: "start",
@@ -368,7 +368,7 @@ const emptySectionTextStyle = {
   color: "#7b5a4d",
 }
 
-const emptySectionActionStyle = {
+const emptySectionCardStyle = {
   display: "flex",
   alignItems: "center",
   gap: "14px",
@@ -445,6 +445,7 @@ const ticketsStyle = {
   color: "#5a4bff",
   fontWeight: "700",
 }
+
 
 
 
