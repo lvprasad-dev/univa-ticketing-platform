@@ -47,6 +47,7 @@ const cities = [
 
 const DEFAULT_CITY = cities[0].name
 const profilePhotoKey = "univa-profile-photo"
+const profileDisplayKey = "univa-profile-display"
 const sidebarOpenKey = "univa-sidebar-open"
 const selectedLocationKey = "univa-selected-location"
 const selectedLocationEvent = "univa-location-change"
@@ -292,9 +293,27 @@ export default function Navbar() {
 
   useEffect(() => {
     const savedProfilePhoto = getLocalStorageValue(profilePhotoKey)
+    const savedProfileDisplay = getLocalStorageValue(profileDisplayKey)
 
     if (savedProfilePhoto) {
       setProfilePhoto(savedProfilePhoto)
+    }
+
+    if (savedProfileDisplay) {
+      try {
+        const parsedProfileDisplay = JSON.parse(savedProfileDisplay) as {
+          name?: string
+          email?: string
+        }
+
+        if (parsedProfileDisplay.name) {
+          setProfileName(parsedProfileDisplay.name)
+        }
+
+        if (parsedProfileDisplay.email) {
+          setProfileEmail(parsedProfileDisplay.email)
+        }
+      } catch {}
     }
 
     let isMounted = true
@@ -305,13 +324,29 @@ export default function Navbar() {
       } = await supabase.auth.getSession()
 
       if (isMounted) {
+        const cachedProfileDisplay = getLocalStorageValue(profileDisplayKey)
+        let resolvedCachedName = ""
+        let resolvedCachedEmail = ""
+
+        if (cachedProfileDisplay) {
+          try {
+            const parsedProfileDisplay = JSON.parse(cachedProfileDisplay) as {
+              name?: string
+              email?: string
+            }
+            resolvedCachedName = parsedProfileDisplay.name || ""
+            resolvedCachedEmail = parsedProfileDisplay.email || ""
+          } catch {}
+        }
+
         const resolvedName =
+          resolvedCachedName ||
           session?.user.user_metadata?.full_name ||
           session?.user.email?.split("@")[0] ||
           "Guest User"
         setIsLoggedIn(Boolean(session))
         setProfileName(resolvedName)
-        setProfileEmail(session?.user.email || "")
+        setProfileEmail(resolvedCachedEmail || session?.user.email || "")
 
         if (!session) {
           removeSessionStorageValue(loginHandledKey)
@@ -325,13 +360,29 @@ export default function Navbar() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(
       (event: AuthChangeEvent, session: Session | null) => {
+        const cachedProfileDisplay = getLocalStorageValue(profileDisplayKey)
+        let resolvedCachedName = ""
+        let resolvedCachedEmail = ""
+
+        if (cachedProfileDisplay) {
+          try {
+            const parsedProfileDisplay = JSON.parse(cachedProfileDisplay) as {
+              name?: string
+              email?: string
+            }
+            resolvedCachedName = parsedProfileDisplay.name || ""
+            resolvedCachedEmail = parsedProfileDisplay.email || ""
+          } catch {}
+        }
+
         const resolvedName =
+          resolvedCachedName ||
           session?.user.user_metadata?.full_name ||
           session?.user.email?.split("@")[0] ||
           "Guest User"
         setIsLoggedIn(Boolean(session))
         setProfileName(resolvedName)
-        setProfileEmail(session?.user.email || "")
+        setProfileEmail(resolvedCachedEmail || session?.user.email || "")
 
         if (event === "SIGNED_IN" && session) {
           const currentLoginDay = getLocalDayKey()
@@ -350,12 +401,14 @@ export default function Navbar() {
 
         if (event === "TOKEN_REFRESHED" && session) {
           setIsLoggedIn(Boolean(session))
-          setProfileEmail(session?.user.email || "")
+          setProfileEmail(resolvedCachedEmail || session?.user.email || "")
         }
 
         if (event === "SIGNED_OUT") {
           removeSessionStorageValue(loginHandledKey)
           removeSessionStorageValue(lastAuthNotificationKey)
+          setProfileName("Guest User")
+          setProfileEmail("")
         }
       }
     )
@@ -363,6 +416,35 @@ export default function Navbar() {
     return () => {
       isMounted = false
       subscription.unsubscribe()
+    }
+  }, [])
+
+  useEffect(() => {
+    const handleProfileStorageChange = (event: StorageEvent) => {
+      if (event.key !== profileDisplayKey) {
+        return
+      }
+
+      const cachedProfileDisplay = getLocalStorageValue(profileDisplayKey)
+
+      if (!cachedProfileDisplay) {
+        return
+      }
+
+      try {
+        const parsedProfileDisplay = JSON.parse(cachedProfileDisplay) as {
+          name?: string
+          email?: string
+        }
+        setProfileName(parsedProfileDisplay.name || "Guest User")
+        setProfileEmail(parsedProfileDisplay.email || "")
+      } catch {}
+    }
+
+    window.addEventListener("storage", handleProfileStorageChange)
+
+    return () => {
+      window.removeEventListener("storage", handleProfileStorageChange)
     }
   }, [])
 

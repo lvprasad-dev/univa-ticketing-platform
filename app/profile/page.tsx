@@ -5,6 +5,7 @@ import { ChangeEvent, useEffect, useRef, useState, useSyncExternalStore } from "
 import { supabase } from "@/lib/supabaseClient"
 
 const profilePhotoKey = "univa-profile-photo"
+const profileDisplayKey = "univa-profile-display"
 
 export default function ProfilePage() {
   const [profileName, setProfileName] = useState("Guest User")
@@ -53,10 +54,16 @@ export default function ProfilePage() {
         session?.user.user_metadata?.full_name ||
         session?.user.email?.split("@")[0] ||
         "Guest User"
-      const resolvedEmail = session?.user.email || ""
+      const cachedProfile =
+        typeof window !== "undefined"
+          ? window.localStorage.getItem(profileDisplayKey)
+          : null
+      const parsedCachedProfile = cachedProfile ? JSON.parse(cachedProfile) : null
+      const resolvedEmail = parsedCachedProfile?.email || session?.user.email || ""
+      const resolvedDisplayName = parsedCachedProfile?.name || resolvedName
 
-      setProfileName(resolvedName)
-      setEditableName(resolvedName)
+      setProfileName(resolvedDisplayName)
+      setEditableName(resolvedDisplayName)
       setProfileEmail(resolvedEmail)
       setEditableEmail(resolvedEmail)
     }
@@ -123,6 +130,17 @@ export default function ProfilePage() {
     if (error) {
       setMessage(error.message)
       return
+    }
+
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(
+        profileDisplayKey,
+        JSON.stringify({
+          name: trimmedName,
+          email: trimmedEmail,
+        })
+      )
+      window.dispatchEvent(new StorageEvent("storage", { key: profileDisplayKey }))
     }
 
     setProfileName(trimmedName)
