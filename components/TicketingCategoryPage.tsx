@@ -367,8 +367,9 @@ const gridStyle = {
   maxWidth: "1180px",
   margin: "0 auto",
   display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+  gridTemplateColumns: "repeat(auto-fit, minmax(200px, 240px))",
   gap: "18px",
+  justifyContent: "center",
 }
 
 const cardStyle = {
