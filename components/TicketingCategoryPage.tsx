@@ -367,36 +367,36 @@ const gridStyle = {
   maxWidth: "1180px",
   margin: "0 auto",
   display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-  gap: "24px",
+  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+  gap: "18px",
 }
 
 const cardStyle = {
-  padding: "22px",
-  borderRadius: "24px",
+  padding: "18px",
+  borderRadius: "20px",
   background: "rgba(207, 229, 255, 0.88)",
   boxShadow: "0 18px 36px rgba(45, 88, 160, 0.18)",
   backdropFilter: "blur(4px)",
 }
 
 const posterStyle = {
-  height: "180px",
+  height: "140px",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  borderRadius: "20px",
-  marginBottom: "18px",
+  borderRadius: "16px",
+  marginBottom: "14px",
   background: "rgba(162, 203, 255, 0.82)",
 }
 
 const posterIconStyle = {
-  fontSize: "54px",
+  fontSize: "46px",
 }
 
 const cardTitleStyle = {
   marginBottom: "8px",
   color: "#171127",
-  fontSize: "24px",
+  fontSize: "20px",
 }
 
 const cardMetaStyle = {
@@ -428,10 +428,10 @@ const listingModeStyle = (isLive?: string) => ({
 })
 
 const priceStyle = {
-  margin: "14px 0 18px",
+  margin: "12px 0 14px",
   color: "#ff7a00",
   fontWeight: "700",
-  fontSize: "18px",
+  fontSize: "16px",
 }
 
 const statusTextStyle = {
