@@ -286,7 +286,10 @@ const pageStyle = {
   marginTop: "72px",
   minHeight: "100vh",
   padding: "40px 32px",
-  background: "#faf7ff",
+  backgroundImage: "url('/univa-checkout-page-bg.png')",
+  backgroundSize: "cover",
+  backgroundPosition: "center top",
+  backgroundRepeat: "no-repeat",
 }
 
 const cardStyle = {
