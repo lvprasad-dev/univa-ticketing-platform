@@ -260,7 +260,8 @@ export default function ProfilePage() {
               <div style={inputWrapStyle}>
                 <input
                   type="email"
-                  value={editableEmail || "Signed out"}
+                  value={editableEmail}
+                  placeholder="Enter email"
                   onChange={(event) => setEditableEmail(event.target.value)}
                   readOnly={!isEditingEmail}
                   style={isEditingEmail ? editableInputWithIconStyle : readonlyInputWithIconStyle}
