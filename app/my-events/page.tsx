@@ -252,8 +252,8 @@ const tabBarStyle = {
   padding: "8px 10px",
   minHeight: "15px",
   borderRadius: "18px",
-  background: "rgba(255,255,255,0.88)",
-  boxShadow: "0 12px 24px rgba(150,92,52,0.08)",
+  background: "transparent",
+  boxShadow: "none",
 }
 
 
@@ -278,12 +278,12 @@ const headerCardStyle = {
   margin: "0 auto 24px",
   padding: "24px",
   borderRadius: "24px",
-  background: "rgba(255,255,255,0.88)",
+  background: "transparent",
   display: "flex",
   alignItems: "center",
   justifyContent: "space-between",
   gap: "16px",
-  boxShadow: "0 18px 36px rgba(150,92,52,0.08)",
+  boxShadow: "none",
 }
 
 
@@ -319,8 +319,8 @@ const emptyStateStyle = {
   margin: "0 auto",
   padding: "28px",
   borderRadius: "24px",
-  background: "rgba(255,255,255,0.88)",
-  boxShadow: "0 18px 36px rgba(150,92,52,0.08)",
+  background: "transparent",
+  boxShadow: "none",
   display: "grid",
   gap: "14px",
   justifyItems: "start",
@@ -400,8 +400,8 @@ const gridStyle = {
 const cardStyle = {
   padding: "22px",
   borderRadius: "22px",
-  background: "rgba(255,255,255,0.88)",
-  boxShadow: "0 18px 36px rgba(150,92,52,0.08)",
+  background: "transparent",
+  boxShadow: "none",
 }
 
 
@@ -445,3 +445,5 @@ const ticketsStyle = {
   color: "#5a4bff",
   fontWeight: "700",
 }
+
+
