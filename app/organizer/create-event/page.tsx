@@ -270,7 +270,7 @@ const titleStyle = {
 const textStyle = {
   margin: 0,
   color: "#3f281d",
-  fontSize: "13px",
+  fontSize: "15px",
 }
 
 const formStyle = {
@@ -295,22 +295,22 @@ const fullWidthFieldStyle = {
 const labelStyle = {
   color: "#251711",
   fontWeight: "700",
-  fontSize: "12px",
+  fontSize: "14px",
 }
 
 const helperTextStyle = {
   marginTop: "0",
   color: "#5e463b",
-  fontSize: "11px",
+  fontSize: "13px",
 }
 
 const inputStyle = {
   width: "100%",
-  padding: "10px 12px",
+  padding: "12px 14px",
   borderRadius: "10px",
   border: "1px solid rgba(99, 69, 54, 0.2)",
   background: "rgba(255, 255, 255, 0.96)",
-  fontSize: "13px",
+  fontSize: "15px",
   color: "#20120d",
   boxShadow: "0 8px 18px rgba(34, 22, 16, 0.08)",
 }
