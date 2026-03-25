@@ -1,6 +1,7 @@
 "use client"
 
-import { useState, useSyncExternalStore } from "react"
+import { useEffect, useState, useSyncExternalStore } from "react"
+import { supabase } from "@/lib/supabaseClient"
 import {
   getNotificationHeading,
   getNotifications,
@@ -9,12 +10,40 @@ import {
 } from "@/lib/notifications"
 
 export default function NotificationsPage() {
+  const [profileName, setProfileName] = useState("User")
   const notifications = useSyncExternalStore(
     subscribeToNotifications,
     getNotifications,
     () => []
   )
   const [activeId, setActiveId] = useState<string>(notifications[0]?.id || "")
+
+  useEffect(() => {
+    let isMounted = true
+
+    const loadUser = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+
+      if (!isMounted || !user) {
+        return
+      }
+
+      const resolvedName =
+        user.user_metadata?.full_name ||
+        user.email?.split("@")[0] ||
+        "User"
+
+      setProfileName(resolvedName)
+    }
+
+    loadUser()
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
 
   const resolvedActiveId = notifications.some((notification) => notification.id === activeId)
     ? activeId
@@ -50,6 +79,16 @@ export default function NotificationsPage() {
           }}
         >
           Notifications
+        </p>
+        <p
+          style={{
+            margin: "0 0 10px",
+            color: "#5b5476",
+            fontSize: "15px",
+            fontWeight: "600",
+          }}
+        >
+          Welcome, {profileName}
         </p>
         <p
           style={{

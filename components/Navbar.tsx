@@ -789,7 +789,10 @@ export default function Navbar() {
       {showNotificationsPanel && !isSimpleNavbarPage && (
         <aside style={notificationsDrawerStyle}>
           <div style={notificationsDrawerHeaderStyle}>
-            <p style={notificationsEyebrowStyle}>Notifications</p>
+            <div>
+              <p style={notificationsEyebrowStyle}>Notifications</p>
+              <p style={notificationsWelcomeStyle}>Welcome, {profileName}</p>
+            </div>
             <button
               type="button"
               onClick={() => setShowNotificationsPanel(false)}
@@ -1073,6 +1076,13 @@ const notificationsEyebrowStyle = {
   fontWeight: "700",
   letterSpacing: "0.08em",
   textTransform: "uppercase" as const,
+}
+
+const notificationsWelcomeStyle = {
+  margin: "8px 0 0",
+  color: "#5b5476",
+  fontSize: "15px",
+  fontWeight: "600",
 }
 
 const notificationsCloseStyle = {
