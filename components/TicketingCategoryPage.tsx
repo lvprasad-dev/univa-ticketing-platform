@@ -232,7 +232,7 @@ export default function TicketingCategoryPage({
         ...pageStyle,
         ...(backgroundImage
           ? {
-              backgroundImage: `linear-gradient(rgba(255, 248, 241, 0.76), rgba(255, 255, 255, 0.82)), url('${backgroundImage}')`,
+              backgroundImage: `url('${backgroundImage}')`,
               backgroundSize: "cover",
               backgroundPosition: "center top",
               backgroundRepeat: "no-repeat",
@@ -328,7 +328,7 @@ const pageStyle = {
   marginTop: "55px",
   minHeight: "100vh",
   padding: "120px 32px 56px",
-  background: "linear-gradient(180deg, #fff8f1, #ffffff)",
+  background: "transparent",
 }
 
 const heroStyle = {
@@ -374,8 +374,8 @@ const gridStyle = {
 const cardStyle = {
   padding: "22px",
   borderRadius: "24px",
-  background: "white",
-  boxShadow: "0 18px 36px rgba(37, 25, 77, 0.1)",
+  background: "transparent",
+  boxShadow: "none",
 }
 
 const posterStyle = {
@@ -385,7 +385,7 @@ const posterStyle = {
   justifyContent: "center",
   borderRadius: "20px",
   marginBottom: "18px",
-  background: "linear-gradient(135deg, #fff1e7, #f5f1ff)",
+  background: "transparent",
 }
 
 const posterIconStyle = {
