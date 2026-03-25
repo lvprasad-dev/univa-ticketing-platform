@@ -175,6 +175,28 @@ export const clearAllNotifications = () => {
   writeNotifications([])
 }
 
+export const markNotificationRead = (notificationId: string) => {
+  const notifications = readNotifications()
+  let hasChanged = false
+
+  const nextNotifications = notifications.map((notification) => {
+    if (notification.id !== notificationId || notification.isRead) {
+      return notification
+    }
+
+    hasChanged = true
+
+    return {
+      ...notification,
+      isRead: true,
+    }
+  })
+
+  if (hasChanged) {
+    writeNotifications(nextNotifications)
+  }
+}
+
 export const markAllNotificationsRead = () => {
   const notifications = readNotifications()
   const hasUnreadNotifications = notifications.some((notification) => !notification.isRead)

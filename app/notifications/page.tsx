@@ -1,11 +1,10 @@
 "use client"
 
-import { useEffect, useState, useSyncExternalStore } from "react"
+import { useState, useSyncExternalStore } from "react"
 import {
-  clearAllNotifications,
   getNotificationHeading,
   getNotifications,
-  markAllNotificationsRead,
+  markNotificationRead,
   subscribeToNotifications,
 } from "@/lib/notifications"
 
@@ -16,11 +15,6 @@ export default function NotificationsPage() {
     () => []
   )
   const [activeId, setActiveId] = useState<string>(notifications[0]?.id || "")
-
-  useEffect(() => {
-    markAllNotificationsRead()
-    clearAllNotifications()
-  }, [])
 
   const resolvedActiveId = notifications.some((notification) => notification.id === activeId)
     ? activeId
@@ -77,11 +71,12 @@ export default function NotificationsPage() {
                 <button
                   key={notification.id}
                   type="button"
-                  onClick={() =>
+                  onClick={() => {
                     setActiveId((current) =>
                       current === notification.id ? "" : notification.id
                     )
-                  }
+                    markNotificationRead(notification.id)
+                  }}
                   style={{
                     textAlign: "left" as const,
                     border: "1px solid #ece7fb",

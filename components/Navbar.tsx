@@ -14,11 +14,10 @@ import {
 } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import {
-  clearAllNotifications,
   getNotificationHeading,
   getNotifications,
   getUnreadNotificationCount,
-  markAllNotificationsRead,
+  markNotificationRead,
   subscribeToNotifications,
   type AppNotification,
 } from "@/lib/notifications"
@@ -284,10 +283,6 @@ export default function Navbar() {
       setShowSidebar(true)
     }
   }, [isSimpleNavbarPage])
-
-  useEffect(() => {
-    clearAllNotifications()
-  }, [])
 
   const resolvedActiveNotificationId = notifications.some(
     (notification) => notification.id === activeNotificationId
@@ -769,7 +764,6 @@ export default function Navbar() {
                   type="button"
                   onClick={() => {
                     setShowNotificationsPanel(true)
-                    markAllNotificationsRead()
                   }}
                   style={notificationButtonStyle}
                 >
@@ -814,11 +808,12 @@ export default function Navbar() {
                   <button
                     key={notification.id}
                     type="button"
-                    onClick={() =>
+                    onClick={() => {
                       setActiveNotificationId((current) =>
                         current === notification.id ? "" : notification.id
                       )
-                    }
+                      markNotificationRead(notification.id)
+                    }}
                     style={{
                       ...notificationCardStyle,
                       background: isActive ? "#fff7f0" : "#f8f5ff",
