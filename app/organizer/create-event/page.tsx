@@ -241,9 +241,9 @@ const pageStyle = {
 }
 
 const cardStyle = {
-  width: "100%",
+  width: "min(960px, 100%)",
   height: "100%",
-  margin: 0,
+  margin: "0 auto",
   padding: "22px 18px",
   borderRadius: "0",
   background: "transparent",
@@ -275,10 +275,11 @@ const textStyle = {
 
 const formStyle = {
   display: "grid",
-  gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+  gridTemplateColumns: "repeat(2, minmax(0, 420px))",
   gap: "10px 14px",
   flex: 1,
   alignContent: "start",
+  justifyContent: "start",
 }
 
 const fieldWrapperStyle = {
