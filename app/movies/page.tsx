@@ -101,6 +101,7 @@ export default function MoviesPage() {
       description="We show all theatres in your current or selected city and sort them from nearest to farthest."
       icon="🎬"
       listings={movieListings}
+      backgroundImage="/univa-movies-bg.png"
     />
   )
 }

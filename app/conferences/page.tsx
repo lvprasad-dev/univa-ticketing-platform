@@ -61,6 +61,7 @@ export default function ConferencesPage() {
       description="Browse conference venues around your current or selected city and book the nearest option."
       icon="🎤"
       listings={conferenceListings}
+      backgroundImage="/univa-conference-bg.png"
     />
   )
 }

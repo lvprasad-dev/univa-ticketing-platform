@@ -61,6 +61,7 @@ export default function DarshanPage() {
       description="View temple access points and darshan passes based on your current or selected city."
       icon="🙏"
       listings={darshanListings}
+      backgroundImage="/univa-darshan-bg.png"
     />
   )
 }

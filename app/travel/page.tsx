@@ -61,6 +61,7 @@ export default function TravelPage() {
       description="Find travel packages and trip departures around your current or selected city."
       icon="🧳"
       listings={travelListings}
+      backgroundImage="/univa-travel-bg.png"
     />
   )
 }

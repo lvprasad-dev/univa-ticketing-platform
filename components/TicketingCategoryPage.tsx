@@ -30,6 +30,7 @@ type TicketingCategoryPageProps = {
   description: string
   icon: string
   listings: Listing[]
+  backgroundImage?: string
 }
 
 type EventRecord = {
@@ -98,6 +99,7 @@ export default function TicketingCategoryPage({
   description,
   icon,
   listings,
+  backgroundImage,
 }: TicketingCategoryPageProps) {
   const [currentCoordinates, setCurrentCoordinates] = useState<Coordinates | null>(null)
   const [liveListings, setLiveListings] = useState<Listing[]>([])
@@ -225,7 +227,19 @@ export default function TicketingCategoryPage({
   const visibleListings = cityListings.length > 0 ? cityListings : sourceListings
 
   return (
-    <main style={pageStyle}>
+    <main
+      style={{
+        ...pageStyle,
+        ...(backgroundImage
+          ? {
+              backgroundImage: `linear-gradient(rgba(255, 248, 241, 0.76), rgba(255, 255, 255, 0.82)), url('${backgroundImage}')`,
+              backgroundSize: "cover",
+              backgroundPosition: "center top",
+              backgroundRepeat: "no-repeat",
+            }
+          : {}),
+      }}
+    >
       <section style={heroStyle}>
         <p style={eyebrowStyle}>{category}</p>
         <h1 style={titleStyle}>{heading}</h1>

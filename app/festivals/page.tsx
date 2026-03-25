@@ -61,6 +61,7 @@ export default function FestivalsPage() {
       description="See nearby festival venues and book the closest pass from your current or selected city."
       icon="🎉"
       listings={festivalListings}
+      backgroundImage="/univa-festival-bg.png"
     />
   )
 }
