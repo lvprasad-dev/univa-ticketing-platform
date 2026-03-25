@@ -306,7 +306,7 @@ const helperTextStyle = {
 
 const inputStyle = {
   width: "100%",
-  padding: "12px 14px",
+  padding: "10px 12px",
   borderRadius: "10px",
   border: "1px solid rgba(99, 69, 54, 0.2)",
   background: "rgba(255, 255, 255, 0.96)",
@@ -317,8 +317,8 @@ const inputStyle = {
 
 const textareaStyle = {
   ...inputStyle,
-  minHeight: "68px",
-  maxHeight: "68px",
+  minHeight: "56px",
+  maxHeight: "56px",
   resize: "none" as const,
 }
 
