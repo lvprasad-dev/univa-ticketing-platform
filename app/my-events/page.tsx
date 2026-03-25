@@ -400,8 +400,8 @@ const gridStyle = {
 const cardStyle = {
   padding: "22px",
   borderRadius: "22px",
-  background: "transparent",
-  boxShadow: "none",
+  background: "rgba(255, 255, 255, 0.82)",
+  boxShadow: "0 18px 36px rgba(150,92,52,0.1)",
 }
 
 
@@ -445,5 +445,6 @@ const ticketsStyle = {
   color: "#5a4bff",
   fontWeight: "700",
 }
+
 
 
