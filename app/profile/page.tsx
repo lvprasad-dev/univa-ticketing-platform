@@ -265,7 +265,10 @@ const pageStyle = {
   marginTop: "72px",
   minHeight: "100vh",
   padding: "32px 32px 32px 340px",
-  background: "#fff8f2",
+  backgroundImage: "url('/univa-profile-page-bg.png')",
+  backgroundSize: "cover",
+  backgroundPosition: "center top",
+  backgroundRepeat: "no-repeat",
 }
 
 const cardStyle = {
