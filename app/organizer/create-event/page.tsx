@@ -264,13 +264,13 @@ const headerStyle = {
 const titleStyle = {
   margin: "0 0 4px",
   color: "#20120d",
-  fontSize: "28px",
+  fontSize: "30px",
 }
 
 const textStyle = {
   margin: 0,
   color: "#3f281d",
-  fontSize: "15px",
+  fontSize: "14px",
 }
 
 const formStyle = {
@@ -296,13 +296,13 @@ const fullWidthFieldStyle = {
 const labelStyle = {
   color: "#251711",
   fontWeight: "700",
-  fontSize: "14px",
+  fontSize: "13px",
 }
 
 const helperTextStyle = {
   marginTop: "0",
   color: "#5e463b",
-  fontSize: "13px",
+  fontSize: "12px",
 }
 
 const inputStyle = {
@@ -311,7 +311,7 @@ const inputStyle = {
   borderRadius: "10px",
   border: "1px solid rgba(99, 69, 54, 0.2)",
   background: "rgba(255, 255, 255, 0.96)",
-  fontSize: "15px",
+  fontSize: "14px",
   color: "#20120d",
   boxShadow: "0 8px 18px rgba(34, 22, 16, 0.08)",
 }
