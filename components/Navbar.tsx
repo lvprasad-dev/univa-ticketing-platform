@@ -18,7 +18,6 @@ import {
   getNotifications,
   getUnreadNotificationCount,
   markNotificationRead,
-  pushNotification,
   subscribeToNotifications,
   type AppNotification,
 } from "@/lib/notifications"
@@ -391,17 +390,8 @@ export default function Navbar() {
             getSessionStorageValue(loginHandledKey) === "true"
           const currentAuthMarker = `${session.user.id}:${session.access_token.slice(-12)}`
           const lastAuthMarker = getSessionStorageValue(lastAuthNotificationKey)
-          const hasLoggedInBefore = getLocalStorageValue(hasLoggedInBeforeKey) === "true"
 
           if (!alreadyHandledInSession && lastAuthMarker !== currentAuthMarker) {
-            pushNotification({
-              title: hasLoggedInBefore ? "Welcome back to UNIVA" : "Welcome to UNIVA",
-              message: hasLoggedInBefore
-                ? `Welcome back, ${resolvedName}. Your ticketing space is ready with the latest updates, events, and bookings in one place.`
-                : `Welcome to UNIVA, ${resolvedName}. Discover events, book tickets, and manage your experience smoothly from one platform.`,
-              href: "/notifications",
-              source: "auth",
-            })
             setLocalStorageValue(hasLoggedInBeforeKey, "true")
             setLocalStorageValue(lastLoginDayKey, currentLoginDay)
             setSessionStorageValue(loginHandledKey, "true")
