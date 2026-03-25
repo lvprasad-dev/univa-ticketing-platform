@@ -572,7 +572,7 @@ export default function Navbar() {
                 </button>
               )}
               <p style={profileNameStyle}>{profileName}</p>
-              <p style={profileEmailStyle}>{profileEmail || "Signed out"}</p>
+              <p style={profileEmailStyle}>{profileEmail}</p>
             </div>
 
             <div style={sidebarLinksStyle}>
