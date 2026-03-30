@@ -110,7 +110,7 @@ export default function MyEventsPage() {
     },
     Finished: {
       events: finishedEvents,
-      emptyText: "No finished events yet.",
+      emptyText: "There are no finished events yet.",
     },
   } as const
 
@@ -168,20 +168,30 @@ function EventSection({
   emptyText: string
 }) {
   if (events.length === 0) {
-    if (title !== "Live") {
-      return null
+    if (title === "Live") {
+      return (
+        <section style={sectionStyle}>
+          <div style={emptyLiveCardStyle}>
+            <p style={emptyLiveTextStyle}>{emptyText}</p>
+            <Link href="/organizer/create-event" style={primaryLinkStyle}>
+              Create Event
+            </Link>
+          </div>
+        </section>
+      )
     }
 
-    return (
-      <section style={sectionStyle}>
-        <div style={emptyLiveCardStyle}>
-          <p style={emptyLiveTextStyle}>{emptyText}</p>
-          <Link href="/organizer/create-event" style={primaryLinkStyle}>
-            Create Event
-          </Link>
-        </div>
-      </section>
-    )
+    if (title === "Finished") {
+      return (
+        <section style={sectionStyle}>
+          <div style={emptyLiveCardStyle}>
+            <p style={emptyLiveTextStyle}>{emptyText}</p>
+          </div>
+        </section>
+      )
+    }
+
+    return null
   }
 
   return (
@@ -390,6 +400,7 @@ const ticketsStyle = {
   color: "#5a4bff",
   fontWeight: "700",
 }
+
 
 
 
