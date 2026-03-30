@@ -287,6 +287,15 @@ const infoStyle = {
   color: "#6a564f",
 }
 
+const pageStyle = {
+  marginTop: "72px",
+  minHeight: "100vh",
+  padding: "15px 32px 32px",
+  backgroundImage: "url('/univa-my-events-bg.png')",
+  backgroundSize: "100% auto",
+  backgroundPosition: "center top",
+  backgroundRepeat: "no-repeat",
+}
 const errorStyle = {
   ...infoStyle,
   color: "#d14343",
@@ -403,6 +412,7 @@ const ticketsStyle = {
   color: "#5a4bff",
   fontWeight: "700",
 }
+
 
 
 
