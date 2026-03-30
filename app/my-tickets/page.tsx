@@ -183,9 +183,9 @@ export default function MyTicketsPage() {
           {activeSection.tickets.length === 0 ? (
             activeTab === "History" ? (
               <section style={emptyStateStyle}>
-                <h2 style={emptyTitleStyle}>No tickets booked yet</h2>
+                <h2 style={emptyTitleStyle}>No ticket history yet</h2>
                 <p style={subtitleStyle}>
-                  Once you book a ticket, it will appear here with event details and status.
+                  Completed, expired, and inactive bookings will appear here once you have ticket history.
                 </p>
                 <Link href="/movies" style={primaryLinkStyle}>
                   Explore Tickets
@@ -432,5 +432,6 @@ const bookedAtStyle = {
   margin: 0,
   color: "#7b5a4d",
 }
+
 
 
