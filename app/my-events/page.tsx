@@ -151,7 +151,7 @@ export default function MyEventsPage() {
 
       {!isLoading && events.length > 0 && (
         <div style={sectionsWrapStyle}>
-          <EventSection events={activeSection.events} />
+          <EventSection title={activeTab} events={activeSection.events} emptyText={activeSection.emptyText} />
         </div>
       )}
     </main>
@@ -159,12 +159,29 @@ export default function MyEventsPage() {
 }
 
 function EventSection({
+  title,
   events,
+  emptyText,
 }: {
+  title: string
   events: EventRecord[]
+  emptyText: string
 }) {
   if (events.length === 0) {
-    return null
+    if (title !== "Live") {
+      return null
+    }
+
+    return (
+      <section style={sectionStyle}>
+        <div style={emptyLiveCardStyle}>
+          <p style={emptyLiveTextStyle}>{emptyText}</p>
+          <Link href="/organizer/create-event" style={primaryLinkStyle}>
+            Create Event
+          </Link>
+        </div>
+      </section>
+    )
   }
 
   return (
@@ -294,6 +311,24 @@ const sectionStyle = {
 
 
 
+
+const emptyLiveCardStyle = {
+  maxWidth: "1120px",
+  margin: "0 auto",
+  padding: "28px",
+  borderRadius: "24px",
+  background: "rgba(255, 255, 255, 0.82)",
+  boxShadow: "0 18px 36px rgba(150,92,52,0.08)",
+  display: "grid",
+  gap: "14px",
+  justifyItems: "start",
+}
+
+const emptyLiveTextStyle = {
+  margin: 0,
+  color: "#7b5a4d",
+  lineHeight: 1.6,
+}
 const emptyTitleStyle = {
   margin: 0,
   color: "#2f1b14",
@@ -355,6 +390,7 @@ const ticketsStyle = {
   color: "#5a4bff",
   fontWeight: "700",
 }
+
 
 
 
