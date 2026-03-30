@@ -168,7 +168,6 @@ export default function MyEventsPage() {
           <EventSection
             title={activeTab}
             events={activeSection.events}
-            emptyText={activeSection.emptyText}
           />
         </div>
       )}
@@ -179,12 +178,14 @@ export default function MyEventsPage() {
 function EventSection({
   title,
   events,
-  emptyText,
 }: {
   title: string
   events: EventRecord[]
-  emptyText: string
 }) {
+  if (events.length === 0) {
+    return null
+  }
+
   return (
     <section style={sectionStyle}>
       <div style={sectionHeaderStyle}>
@@ -192,53 +193,31 @@ function EventSection({
         <span style={countBadgeStyle}>{events.length}</span>
       </div>
 
-      {events.length === 0 ? (
-        <div style={emptySectionCardStyle}>
-          <p style={emptySectionTextStyle}>{emptyText}</p>
-          {title === "Live" && (
-            <Link href="/organizer/create-event" style={emptySectionButtonStyle}>
-              Create Event
-            </Link>
-          )}
-        </div>
-      ) : (
-        <div style={gridStyle}>
-          {events.map((event) => (
-            <article key={event.id} style={cardStyle}>
-              <p style={badgeStyle}>{event.category}</p>
-              <h2 style={cardTitleStyle}>{event.title}</h2>
-              <p style={metaStyle}>{event.venue}, {event.city}</p>
-              <p style={metaStyle}>{new Date(event.event_date).toLocaleString()}</p>
-              {event.location_url && (
-                <a
-                  href={event.location_url}
-                  target="_blank"
-                  rel="noreferrer"
-                  style={locationLinkStyle}
-                >
-                  Open Venue Location
-                </a>
-              )}
-              <p style={priceStyle}>Rs.{event.price}</p>
-              <p style={ticketsStyle}>{event.available_tickets} tickets available</p>
-            </article>
-          ))}
-        </div>
-      )}
+      <div style={gridStyle}>
+        {events.map((event) => (
+          <article key={event.id} style={cardStyle}>
+            <p style={badgeStyle}>{event.category}</p>
+            <h2 style={cardTitleStyle}>{event.title}</h2>
+            <p style={metaStyle}>{event.venue}, {event.city}</p>
+            <p style={metaStyle}>{new Date(event.event_date).toLocaleString()}</p>
+            {event.location_url && (
+              <a
+                href={event.location_url}
+                target="_blank"
+                rel="noreferrer"
+                style={locationLinkStyle}
+              >
+                Open Venue Location
+              </a>
+            )}
+            <p style={priceStyle}>Rs.{event.price}</p>
+            <p style={ticketsStyle}>{event.available_tickets} tickets available</p>
+          </article>
+        ))}
+      </div>
     </section>
   )
 }
-
-const pageStyle = {
-  marginTop: "72px",
-  minHeight: "100vh",
-  padding: "15px 32px 32px",
-  backgroundImage: "url('/univa-my-events-bg.png')",
-  backgroundSize: "100% auto",
-  backgroundPosition: "center top",
-  backgroundRepeat: "no-repeat",
-}
-
 
 const tabBarWrapStyle = {
   maxWidth: "1120px",
@@ -363,27 +342,6 @@ const countBadgeStyle = {
   fontWeight: "700",
 }
 
-const emptySectionTextStyle = {
-  margin: 0,
-  color: "#7b5a4d",
-}
-
-const emptySectionCardStyle = {
-  display: "flex",
-  alignItems: "center",
-  gap: "14px",
-  flexWrap: "wrap" as const,
-}
-
-const emptySectionButtonStyle = {
-  textDecoration: "none",
-  padding: "10px 16px",
-  borderRadius: "12px",
-  background: "#ff7a00",
-  color: "white",
-  fontWeight: "700",
-}
-
 const emptyTitleStyle = {
   margin: 0,
   color: "#2f1b14",
@@ -445,6 +403,9 @@ const ticketsStyle = {
   color: "#5a4bff",
   fontWeight: "700",
 }
+
+
+
 
 
 
