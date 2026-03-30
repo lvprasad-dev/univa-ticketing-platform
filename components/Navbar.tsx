@@ -435,7 +435,6 @@ export default function Navbar() {
         }
 
         if (event === "TOKEN_REFRESHED" && session) {
-          markLastActivityNow()
           setIsLoggedIn(Boolean(session))
           setProfileEmail(resolvedCachedEmail || session?.user.email || "")
         }
@@ -490,18 +489,34 @@ export default function Navbar() {
     }
 
     let timeoutId = 0
+    let checkingLogout = false
+
+    const performLogoutIfInactive = async () => {
+      if (checkingLogout) {
+        return
+      }
+
+      const lastActivityAt = getLastActivityAt()
+
+      if (!lastActivityAt || Date.now() - lastActivityAt <= inactivityTimeoutMs) {
+        return
+      }
+
+      checkingLogout = true
+      removeSessionStorageValue(sidebarOpenKey)
+      removeSessionStorageValue(loginHandledKey)
+      removeSessionStorageValue(lastAuthNotificationKey)
+      await supabase.auth.signOut()
+      setShowSidebar(false)
+      setShowNotificationsPanel(false)
+      router.push("/login?message=Session%20expired%20after%2030%20minutes%20of%20inactivity.")
+    }
 
     const resetLogoutTimer = () => {
       markLastActivityNow()
       window.clearTimeout(timeoutId)
-      timeoutId = window.setTimeout(async () => {
-        removeSessionStorageValue(sidebarOpenKey)
-        removeSessionStorageValue(loginHandledKey)
-        removeSessionStorageValue(lastAuthNotificationKey)
-        await supabase.auth.signOut()
-        setShowSidebar(false)
-        setShowNotificationsPanel(false)
-        router.push("/login?message=Session%20expired%20after%2030%20minutes%20of%20inactivity.")
+      timeoutId = window.setTimeout(() => {
+        void performLogoutIfInactive()
       }, inactivityTimeoutMs)
     }
 
@@ -513,14 +528,27 @@ export default function Navbar() {
       "touchstart",
     ]
 
+    const visibilityHandler = () => {
+      if (document.visibilityState === "visible") {
+        void performLogoutIfInactive()
+      }
+    }
+
+    const intervalId = window.setInterval(() => {
+      void performLogoutIfInactive()
+    }, 60_000)
+
     for (const activityEvent of activityEvents) {
       window.addEventListener(activityEvent, resetLogoutTimer, { passive: true })
     }
 
+    document.addEventListener("visibilitychange", visibilityHandler)
     resetLogoutTimer()
 
     return () => {
       window.clearTimeout(timeoutId)
+      window.clearInterval(intervalId)
+      document.removeEventListener("visibilitychange", visibilityHandler)
 
       for (const activityEvent of activityEvents) {
         window.removeEventListener(activityEvent, resetLogoutTimer)
@@ -1295,3 +1323,4 @@ const activeMovieChipStyle = {
   background: "#ff7a00",
   color: "white",
 }
+
