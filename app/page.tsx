@@ -1,7 +1,9 @@
 "use client"
 
 import Link from "next/link"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
+import { supabase } from "@/lib/supabaseClient"
 
 const categories = [
   { label: "Movies", href: "/movies" },
@@ -14,10 +16,42 @@ const userRoleKey = "univa-user-role"
 
 export default function Home() {
   const router = useRouter()
+  const [isCheckingSession, setIsCheckingSession] = useState(true)
+
+  useEffect(() => {
+    let isMounted = true
+
+    const ensureLoggedIn = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+
+      if (!isMounted) {
+        return
+      }
+
+      if (!session) {
+        router.replace("/login")
+        return
+      }
+
+      setIsCheckingSession(false)
+    }
+
+    ensureLoggedIn()
+
+    return () => {
+      isMounted = false
+    }
+  }, [router])
 
   const handleRoleSelect = (role: "buyer" | "seller") => {
     window.localStorage.setItem(userRoleKey, role)
     router.push(role === "buyer" ? "/movies" : "/organizer/create-event")
+  }
+
+  if (isCheckingSession) {
+    return null
   }
 
   return (
