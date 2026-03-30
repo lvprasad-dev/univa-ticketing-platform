@@ -115,10 +115,6 @@ export default function MyEventsPage() {
   } as const
 
   const activeSection = tabConfig[activeTab]
-  const headerMessage =
-    activeTab === "Live" && activeSection.events.length === 0
-      ? "No live events are running."
-      : "Manage your live, upcoming, and finished events in one place."
 
   return (
     <main style={pageStyle}>
@@ -135,16 +131,6 @@ export default function MyEventsPage() {
             </button>
           ))}
         </div>
-      </section>
-
-      <section style={headerCardStyle}>
-        <div>
-          <p style={subtitleStyle}>{headerMessage}</p>
-        </div>
-
-        <Link href="/organizer/create-event" style={primaryLinkStyle}>
-          Create New Event
-        </Link>
       </section>
 
       {isLoading && <p style={infoStyle}>Loading your events...</p>}
@@ -165,10 +151,7 @@ export default function MyEventsPage() {
 
       {!isLoading && events.length > 0 && (
         <div style={sectionsWrapStyle}>
-          <EventSection
-            title={activeTab}
-            events={activeSection.events}
-          />
+          <EventSection events={activeSection.events} />
         </div>
       )}
     </main>
@@ -176,10 +159,8 @@ export default function MyEventsPage() {
 }
 
 function EventSection({
-  title,
   events,
 }: {
-  title: string
   events: EventRecord[]
 }) {
   if (events.length === 0) {
@@ -188,11 +169,6 @@ function EventSection({
 
   return (
     <section style={sectionStyle}>
-      <div style={sectionHeaderStyle}>
-        <h2 style={sectionTitleStyle}>{title}</h2>
-        <span style={countBadgeStyle}>{events.length}</span>
-      </div>
-
       <div style={gridStyle}>
         {events.map((event) => (
           <article key={event.id} style={cardStyle}>
@@ -252,18 +228,6 @@ const activeTabButtonStyle = {
   color: "white",
 }
 
-const headerCardStyle = {
-  maxWidth: "1120px",
-  margin: "0 auto 24px",
-  padding: "24px",
-  borderRadius: "24px",
-  background: "rgba(255, 255, 255, 0.82)",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "space-between",
-  gap: "16px",
-  boxShadow: "0 18px 36px rgba(150,92,52,0.08)",
-}
 
 
 const subtitleStyle = {
@@ -327,29 +291,8 @@ const sectionStyle = {
   gap: "16px",
 }
 
-const sectionHeaderStyle = {
-  display: "flex",
-  alignItems: "center",
-  gap: "12px",
-}
 
-const sectionTitleStyle = {
-  margin: 0,
-  color: "#2f1b14",
-}
 
-const countBadgeStyle = {
-  display: "inline-flex",
-  alignItems: "center",
-  justifyContent: "center",
-  minWidth: "32px",
-  height: "32px",
-  padding: "0 10px",
-  borderRadius: "999px",
-  background: "#fff0e3",
-  color: "#d76a00",
-  fontWeight: "700",
-}
 
 const emptyTitleStyle = {
   margin: 0,
@@ -412,6 +355,9 @@ const ticketsStyle = {
   color: "#5a4bff",
   fontWeight: "700",
 }
+
+
+
 
 
 
