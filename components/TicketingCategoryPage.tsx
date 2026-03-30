@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react"
+import { pushNotification } from "@/lib/notifications"
 
 type Listing = {
   id?: string
@@ -313,6 +314,18 @@ export default function TicketingCategoryPage({
                 }
                 className="primary-cta"
                 style={actionStyle}
+                onClick={() => {
+                  pushNotification({
+                    title: `${category} update`,
+                    message: `${listing.title} at ${listing.venue}, ${listing.city} was opened from the ${category} page. ${
+                      listing.id
+                        ? "Live booking details are ready for checkout."
+                        : "This is currently shown as a preview listing."
+                    }`,
+                    href: "/checkout",
+                    source: "system",
+                  })
+                }}
               >
                 {listing.id ? "Book Now" : "Preview Price"}
               </Link>
