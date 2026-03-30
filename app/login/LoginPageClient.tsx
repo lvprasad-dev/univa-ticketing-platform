@@ -1,6 +1,6 @@
 "use client"
 
-import { FormEvent, useState } from "react"
+import { FormEvent, useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { supabase } from "@/lib/supabaseClient"
 
@@ -35,6 +35,28 @@ export default function LoginPageClient({
 
   const router = useRouter()
   const statusMessage = message || authMessage
+
+  useEffect(() => {
+    let isMounted = true
+
+    const resetLoginSession = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+
+      if (!isMounted || !session) {
+        return
+      }
+
+      await supabase.auth.signOut()
+    }
+
+    resetLoginSession()
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
 
   const normalizePhoneNumber = (dialCode: string, value: string) => {
     const trimmedDialCode = dialCode.trim()
