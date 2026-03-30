@@ -132,7 +132,7 @@ export default function MyTicketsPage() {
     activeTab === "Active"
       ? {
           tickets: activeTickets,
-          emptyText: "No active tickets available right now.",
+          emptyText: "There are No Active tickets",
           headerText: "Your upcoming booked tickets appear here.",
         }
       : {
@@ -156,17 +156,6 @@ export default function MyTicketsPage() {
             </button>
           ))}
         </div>
-      </section>
-
-      <section style={headerCardStyle}>
-        <div>
-          <h1 style={titleStyle}>My Tickets</h1>
-          <p style={subtitleStyle}>{activeSection.headerText}</p>
-        </div>
-
-        <Link href="/movies" style={primaryLinkStyle}>
-          Book More Tickets
-        </Link>
       </section>
 
       {isLoading && <p style={infoStyle}>Loading your booked tickets...</p>}
@@ -289,23 +278,7 @@ const activeTabButtonStyle = {
   color: "white",
 }
 
-const headerCardStyle = {
-  maxWidth: "1120px",
-  margin: "0 auto 24px",
-  padding: "24px",
-  borderRadius: "24px",
-  background: "rgba(255,255,255,0.9)",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "space-between",
-  gap: "16px",
-  boxShadow: "0 18px 36px rgba(30,18,12,0.14)",
-}
 
-const titleStyle = {
-  margin: "0 0 8px",
-  color: "#2f1b14",
-}
 
 const subtitleStyle = {
   margin: 0,
@@ -459,4 +432,5 @@ const bookedAtStyle = {
   margin: 0,
   color: "#7b5a4d",
 }
+
 
