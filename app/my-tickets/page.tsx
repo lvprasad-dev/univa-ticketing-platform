@@ -161,19 +161,7 @@ export default function MyTicketsPage() {
       {isLoading && <p style={infoStyle}>Loading your booked tickets...</p>}
       {!isLoading && errorMessage && <p style={errorStyle}>{errorMessage}</p>}
 
-      {!isLoading && !errorMessage && bookings.length === 0 && (
-        <section style={emptyStateStyle}>
-          <h2 style={emptyTitleStyle}>No tickets booked yet</h2>
-          <p style={subtitleStyle}>
-            Once you book a ticket, it will appear here with event details and status.
-          </p>
-          <Link href="/movies" style={primaryLinkStyle}>
-            Explore Tickets
-          </Link>
-        </section>
-      )}
-
-      {!isLoading && bookings.length > 0 && (
+      {!isLoading && !errorMessage && (
         <section style={sectionStyle}>
           <div style={sectionHeaderStyle}>
             <h2 style={sectionTitleStyle}>{activeTab} Tickets</h2>
@@ -432,6 +420,7 @@ const bookedAtStyle = {
   margin: 0,
   color: "#7b5a4d",
 }
+
 
 
 
