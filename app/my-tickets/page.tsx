@@ -163,10 +163,6 @@ export default function MyTicketsPage() {
 
       {!isLoading && !errorMessage && (
         <section style={sectionStyle}>
-          <div style={sectionHeaderStyle}>
-            <h2 style={sectionTitleStyle}>{activeTab} Tickets</h2>
-            <span style={countBadgeStyle}>{activeSection.tickets.length}</span>
-          </div>
 
           {activeSection.tickets.length === 0 ? (
             activeTab === "History" ? (
@@ -319,29 +315,8 @@ const sectionStyle = {
   gap: "16px",
 }
 
-const sectionHeaderStyle = {
-  display: "flex",
-  alignItems: "center",
-  gap: "12px",
-}
 
-const sectionTitleStyle = {
-  margin: 0,
-  color: "#2f1b14",
-}
 
-const countBadgeStyle = {
-  display: "inline-flex",
-  alignItems: "center",
-  justifyContent: "center",
-  minWidth: "32px",
-  height: "32px",
-  padding: "0 10px",
-  borderRadius: "999px",
-  background: "#fff0e3",
-  color: "#d76a00",
-  fontWeight: "700",
-}
 
 const emptySectionActionStyle = {
   display: "flex",
@@ -420,6 +395,7 @@ const bookedAtStyle = {
   margin: 0,
   color: "#7b5a4d",
 }
+
 
 
 
