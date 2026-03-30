@@ -55,6 +55,7 @@ const hasLoggedInBeforeKey = "univa-has-logged-in-before"
 const lastLoginDayKey = "univa-last-login-day"
 const loginHandledKey = "univa-login-handled"
 const lastAuthNotificationKey = "univa-last-auth-notification"
+const lastActivityAtKey = "univa-last-activity-at"
 const inactivityTimeoutMs = 30 * 60 * 1000
 const ticketingLinks = [
   { href: "/movies", label: "Movies" },
@@ -102,6 +103,21 @@ const removeSessionStorageValue = (key: string) => {
   try {
     window.sessionStorage.removeItem(key)
   } catch {}
+}
+
+const getLastActivityAt = () => {
+  const value = getLocalStorageValue(lastActivityAtKey)
+
+  if (!value) {
+    return 0
+  }
+
+  const parsedValue = Number(value)
+  return Number.isFinite(parsedValue) ? parsedValue : 0
+}
+
+const markLastActivityNow = () => {
+  setLocalStorageValue(lastActivityAtKey, String(Date.now()))
 }
 
 const toRadians = (value: number) => (value * Math.PI) / 180
@@ -324,6 +340,24 @@ export default function Navbar() {
       } = await supabase.auth.getSession()
 
       if (isMounted) {
+        const lastActivityAt = getLastActivityAt()
+
+        if (
+          session &&
+          lastActivityAt > 0 &&
+          Date.now() - lastActivityAt > inactivityTimeoutMs
+        ) {
+          removeSessionStorageValue(sidebarOpenKey)
+          removeSessionStorageValue(loginHandledKey)
+          removeSessionStorageValue(lastAuthNotificationKey)
+          await supabase.auth.signOut()
+          setIsLoggedIn(false)
+          setProfileName("Guest User")
+          setProfileEmail("")
+          router.push("/login?message=Session%20expired%20after%2030%20minutes%20of%20inactivity.")
+          return
+        }
+
         const cachedProfileDisplay = getLocalStorageValue(profileDisplayKey)
         let resolvedCachedName = ""
         let resolvedCachedEmail = ""
@@ -385,6 +419,7 @@ export default function Navbar() {
         setProfileEmail(resolvedCachedEmail || session?.user.email || "")
 
         if (event === "SIGNED_IN" && session) {
+          markLastActivityNow()
           const currentLoginDay = getLocalDayKey()
           const alreadyHandledInSession =
             getSessionStorageValue(loginHandledKey) === "true"
@@ -400,6 +435,7 @@ export default function Navbar() {
         }
 
         if (event === "TOKEN_REFRESHED" && session) {
+          markLastActivityNow()
           setIsLoggedIn(Boolean(session))
           setProfileEmail(resolvedCachedEmail || session?.user.email || "")
         }
@@ -417,7 +453,7 @@ export default function Navbar() {
       isMounted = false
       subscription.unsubscribe()
     }
-  }, [])
+  }, [router])
 
   useEffect(() => {
     const handleProfileStorageChange = (event: StorageEvent) => {
@@ -456,6 +492,7 @@ export default function Navbar() {
     let timeoutId = 0
 
     const resetLogoutTimer = () => {
+      markLastActivityNow()
       window.clearTimeout(timeoutId)
       timeoutId = window.setTimeout(async () => {
         removeSessionStorageValue(sidebarOpenKey)
@@ -532,6 +569,7 @@ export default function Navbar() {
   const handleLogout = async () => {
     removeSessionStorageValue(sidebarOpenKey)
     removeSessionStorageValue(loginHandledKey)
+    removeSessionStorageValue(lastAuthNotificationKey)
     await supabase.auth.signOut()
     setShowSidebar(false)
     router.push("/")
