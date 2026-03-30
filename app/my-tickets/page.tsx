@@ -192,12 +192,24 @@ export default function MyTicketsPage() {
           </div>
 
           {activeSection.tickets.length === 0 ? (
-            <div style={emptySectionActionStyle}>
-              <p style={emptySectionTextStyle}>{activeSection.emptyText}</p>
-              <Link href="/movies" style={emptySectionButtonStyle}>
-                Explore Events
-              </Link>
-            </div>
+            activeTab === "History" ? (
+              <section style={emptyStateStyle}>
+                <h2 style={emptyTitleStyle}>No tickets booked yet</h2>
+                <p style={subtitleStyle}>
+                  Once you book a ticket, it will appear here with event details and status.
+                </p>
+                <Link href="/movies" style={primaryLinkStyle}>
+                  Explore Tickets
+                </Link>
+              </section>
+            ) : (
+              <div style={emptySectionActionStyle}>
+                <p style={emptySectionTextStyle}>{activeSection.emptyText}</p>
+                <Link href="/movies" style={emptySectionButtonStyle}>
+                  Explore Events
+                </Link>
+              </div>
+            )
           ) : (
             <div style={gridStyle}>
               {activeSection.tickets.map((booking) => (
@@ -447,3 +459,4 @@ const bookedAtStyle = {
   margin: 0,
   color: "#7b5a4d",
 }
+
