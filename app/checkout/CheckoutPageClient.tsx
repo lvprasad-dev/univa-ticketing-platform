@@ -293,20 +293,18 @@ export default function CheckoutPageClient() {
               <button
                 type="button"
                 onClick={handleBooking}
-                disabled={isSubmitting || !isLiveEvent || resolvedEvent.available_tickets === 0}
+                disabled={isSubmitting || (isLiveEvent && resolvedEvent.available_tickets === 0)}
                 style={submitButtonStyle}
               >
                 {isSubmitting
                   ? isFreeEvent
                     ? "Creating Free Ticket..."
                     : "Processing Test Payment..."
-                  : !isLiveEvent
-                    ? "Live Booking Unavailable"
-                    : resolvedEvent.available_tickets === 0
-                      ? "Sold Out"
-                      : isFreeEvent
-                        ? "Get Free Ticket"
-                        : "Pay & Confirm (Test)"}
+                  : isLiveEvent && resolvedEvent.available_tickets === 0
+                    ? "Sold Out"
+                    : isFreeEvent
+                      ? "Get Free Ticket"
+                      : "Pay & Confirm (Test)"}
               </button>
             </section>
           </div>
@@ -515,5 +513,6 @@ const submitButtonStyle = {
   fontWeight: "700",
   cursor: "pointer",
 }
+
 
 
