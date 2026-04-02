@@ -95,17 +95,12 @@ export default function CheckoutPageClient() {
     setErrorMessage("")
     setSuccessMessage("")
 
-    if (!event || !isLiveEvent) {
-      setErrorMessage("This card is only a preview. Booking works only for live events added by the organizer.")
-      return
-    }
-
     if (quantity < 1) {
       setErrorMessage("Choose at least 1 ticket.")
       return
     }
 
-    if (quantity > event.available_tickets) {
+    if (event && quantity > event.available_tickets) {
       setErrorMessage("Requested quantity is higher than available tickets.")
       return
     }
@@ -128,6 +123,16 @@ export default function CheckoutPageClient() {
       setErrorMessage("Please login before booking tickets.")
       setIsSubmitting(false)
       router.push("/login?message=Login%20to%20continue%20your%20booking")
+      return
+    }
+
+    if (!event || !isLiveEvent) {
+      setSuccessMessage(
+        isFreeEvent
+          ? "Preview ticket created for testing. No real booking record was created because this is not a live organizer event."
+          : `Test payment successful (${fakePaymentReference}). Preview checkout completed. No real booking record was created because this is not a live organizer event.`
+      )
+      setIsSubmitting(false)
       return
     }
 
