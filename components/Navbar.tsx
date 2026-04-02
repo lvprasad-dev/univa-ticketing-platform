@@ -939,7 +939,6 @@ export default function Navbar() {
           <div style={notificationsDrawerHeaderStyle}>
             <div>
               <p style={notificationsEyebrowStyle}>Notifications</p>
-              <p style={notificationsWelcomeStyle}>Welcome, {profileName}</p>
             </div>
             <button
               type="button"
@@ -1226,12 +1225,6 @@ const notificationsEyebrowStyle = {
   textTransform: "uppercase" as const,
 }
 
-const notificationsWelcomeStyle = {
-  margin: "8px 0 0",
-  color: "#5b5476",
-  fontSize: "15px",
-  fontWeight: "600",
-}
 
 const notificationsCloseStyle = {
   background: "#ffffff",
@@ -1323,4 +1316,5 @@ const activeMovieChipStyle = {
   background: "#ff7a00",
   color: "white",
 }
+
 

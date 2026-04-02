@@ -10,7 +10,6 @@ import {
 } from "@/lib/notifications"
 
 export default function NotificationsPage() {
-  const [profileName, setProfileName] = useState("User")
   const notifications = useSyncExternalStore(
     subscribeToNotifications,
     getNotifications,
@@ -29,13 +28,6 @@ export default function NotificationsPage() {
       if (!isMounted || !user) {
         return
       }
-
-      const resolvedName =
-        user.user_metadata?.full_name ||
-        user.email?.split("@")[0] ||
-        "User"
-
-      setProfileName(resolvedName)
     }
 
     loadUser()
@@ -79,16 +71,6 @@ export default function NotificationsPage() {
           }}
         >
           Notifications
-        </p>
-        <p
-          style={{
-            margin: "0 0 10px",
-            color: "#5b5476",
-            fontSize: "15px",
-            fontWeight: "600",
-          }}
-        >
-          Welcome, {profileName}
         </p>
         <p
           style={{
@@ -177,3 +159,6 @@ export default function NotificationsPage() {
     </main>
   )
 }
+
+
+

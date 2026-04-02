@@ -38,6 +38,7 @@ export default function CheckoutPageClient() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState("")
   const [successMessage, setSuccessMessage] = useState("")
+  const [paymentMethod, setPaymentMethod] = useState<"test_card" | "test_upi" | "test_wallet">("test_card")
 
   useEffect(() => {
     let isMounted = true
@@ -111,6 +112,14 @@ export default function CheckoutPageClient() {
 
     setIsSubmitting(true)
 
+    let fakePaymentReference = ""
+
+    if (!isFreeEvent) {
+      setSuccessMessage(`Processing test payment through ${paymentMethod.replace("test_", "")}...`)
+      await new Promise((resolve) => window.setTimeout(resolve, 1200))
+      fakePaymentReference = `TESTPAY-${Date.now().toString().slice(-8)}`
+    }
+
     const {
       data: { session },
     } = await supabase.auth.getSession()
@@ -162,7 +171,7 @@ export default function CheckoutPageClient() {
       source: "bookings",
     })
 
-    setSuccessMessage("Booking confirmed. Redirecting to My Tickets...")
+    setSuccessMessage(isFreeEvent ? "Booking confirmed. Redirecting to My Tickets..." : `Test payment successful (${fakePaymentReference}). Booking confirmed. Redirecting to My Tickets...`)
     window.dispatchEvent(new Event("univa-booking-completed"))
 
     window.setTimeout(() => {
@@ -233,6 +242,31 @@ export default function CheckoutPageClient() {
                 />
               </label>
 
+              {!isFreeEvent && (
+                <div style={paymentBoxStyle}>
+                  <span style={labelStyle}>Test payment method</span>
+                  <div style={paymentOptionsStyle}>
+                    {[
+                      { value: "test_card", label: "Test Card" },
+                      { value: "test_upi", label: "Test UPI" },
+                      { value: "test_wallet", label: "Test Wallet" },
+                    ].map((option) => (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => setPaymentMethod(option.value as "test_card" | "test_upi" | "test_wallet")}
+                        style={paymentMethod === option.value ? activePaymentOptionStyle : paymentOptionStyle}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                  <p style={paymentHintStyle}>
+                    This is a fake payment integration for testing. No real money will be charged.
+                  </p>
+                </div>
+              )}
+
               <div style={fareBoxStyle}>
                 <div style={rowStyle}>
                   <span>Ticket price</span>
@@ -265,14 +299,14 @@ export default function CheckoutPageClient() {
                 {isSubmitting
                   ? isFreeEvent
                     ? "Creating Free Ticket..."
-                    : "Booking..."
+                    : "Processing Test Payment..."
                   : !isLiveEvent
                     ? "Live Booking Unavailable"
                     : resolvedEvent.available_tickets === 0
                       ? "Sold Out"
                       : isFreeEvent
                         ? "Get Free Ticket"
-                        : "Confirm Booking"}
+                        : "Pay & Confirm (Test)"}
               </button>
             </section>
           </div>
@@ -413,6 +447,43 @@ const inputStyle = {
   background: "#fffaf7",
 }
 
+
+const paymentBoxStyle = {
+  display: "grid",
+  gap: "12px",
+  padding: "18px",
+  borderRadius: "18px",
+  background: "#fff3e8",
+}
+
+const paymentOptionsStyle = {
+  display: "flex",
+  gap: "10px",
+  flexWrap: "wrap" as const,
+}
+
+const paymentOptionStyle = {
+  border: "1px solid #f0c7b2",
+  padding: "10px 14px",
+  borderRadius: "12px",
+  background: "white",
+  color: "#5f4032",
+  fontWeight: "700",
+  cursor: "pointer",
+}
+
+const activePaymentOptionStyle = {
+  ...paymentOptionStyle,
+  background: "#ff7a00",
+  border: "1px solid #ff7a00",
+  color: "white",
+}
+
+const paymentHintStyle = {
+  margin: 0,
+  color: "#7b5a4d",
+  lineHeight: 1.6,
+}
 const fareBoxStyle = {
   display: "grid",
   gap: "12px",
@@ -444,3 +515,5 @@ const submitButtonStyle = {
   fontWeight: "700",
   cursor: "pointer",
 }
+
+
