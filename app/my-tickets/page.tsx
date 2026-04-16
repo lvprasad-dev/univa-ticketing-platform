@@ -24,11 +24,11 @@ const getTicketLifecycleStatus = (booking: BookingRecord, currentTime: number) =
     : 0
 
   if (booking.booking_status !== "confirmed") {
-    return "Inactive"
+    return "Cancelled"
   }
 
   if (eventTime !== 0 && eventTime < currentTime) {
-    return "Disconnected"
+    return "History"
   }
 
   return "Active"
@@ -138,7 +138,7 @@ export default function MyTicketsPage() {
       : {
           tickets: historyTickets,
           emptyText: "No ticket history yet.",
-          headerText: "Past, expired, and inactive bookings stay here for your records.",
+          headerText: "Past and inactive bookings stay here for your records.",
         }
 
   return (

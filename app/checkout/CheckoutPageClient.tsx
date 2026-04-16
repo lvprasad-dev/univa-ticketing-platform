@@ -19,20 +19,6 @@ type EventRecord = {
 
 const PLATFORM_FEE = 11
 
-type FakeCreditCard = {
-  number: string
-  expiry: string
-  cvc: string
-  holder: string
-}
-
-const sampleFakeCreditCard: FakeCreditCard = {
-  number: "4242 4242 4242 4242",
-  expiry: "12/34",
-  cvc: "123",
-  holder: "Univa Card Holder",
-}
-
 export default function CheckoutPageClient() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -151,18 +137,27 @@ export default function CheckoutPageClient() {
         const normalizedCardHolder = cardHolderInput.trim()
 
         if (!normalizedCardNumber || !normalizedCardExpiry || !normalizedCardCvc || !normalizedCardHolder) {
-          setErrorMessage("Enter the fake card details before confirming the payment.")
+          setErrorMessage("Enter your card details before confirming the payment.")
           setIsSubmitting(false)
           return
         }
 
-        if (
-          normalizedCardNumber !== sampleFakeCreditCard.number ||
-          normalizedCardExpiry !== sampleFakeCreditCard.expiry ||
-          normalizedCardCvc !== sampleFakeCreditCard.cvc ||
-          normalizedCardHolder.toLowerCase() !== sampleFakeCreditCard.holder.toLowerCase()
-        ) {
-          setErrorMessage("Use the shown sample card details exactly to continue.")
+        const expiryPattern = /^(0[1-9]|1[0-2])\/\d{2}$/
+
+        if (normalizedCardNumber.replace(/\s/g, "").length !== 16) {
+          setErrorMessage("Enter a valid 16-digit card number.")
+          setIsSubmitting(false)
+          return
+        }
+
+        if (!expiryPattern.test(normalizedCardExpiry)) {
+          setErrorMessage("Enter a valid expiry in MM/YY format.")
+          setIsSubmitting(false)
+          return
+        }
+
+        if (normalizedCardCvc.length < 3) {
+          setErrorMessage("Enter a valid CVV.")
           setIsSubmitting(false)
           return
         }
