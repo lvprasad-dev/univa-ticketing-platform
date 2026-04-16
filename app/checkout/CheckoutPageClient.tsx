@@ -19,6 +19,46 @@ type EventRecord = {
 
 const PLATFORM_FEE = 11
 
+type FakeCreditCard = {
+  id: "visa_success" | "mastercard_success" | "declined"
+  brand: string
+  number: string
+  expiry: string
+  cvc: string
+  holder: string
+  result: "success" | "declined"
+}
+
+const fakeCreditCards: FakeCreditCard[] = [
+  {
+    id: "visa_success",
+    brand: "Visa",
+    number: "4242 4242 4242 4242",
+    expiry: "12/34",
+    cvc: "123",
+    holder: "Univa Test User",
+    result: "success",
+  },
+  {
+    id: "mastercard_success",
+    brand: "Mastercard",
+    number: "5555 5555 5555 4444",
+    expiry: "11/34",
+    cvc: "321",
+    holder: "Univa Demo Guest",
+    result: "success",
+  },
+  {
+    id: "declined",
+    brand: "Declined Card",
+    number: "4000 0000 0000 0002",
+    expiry: "10/34",
+    cvc: "999",
+    holder: "Univa Failed Payment",
+    result: "declined",
+  },
+]
+
 export default function CheckoutPageClient() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -39,6 +79,12 @@ export default function CheckoutPageClient() {
   const [errorMessage, setErrorMessage] = useState("")
   const [successMessage, setSuccessMessage] = useState("")
   const [paymentMethod, setPaymentMethod] = useState<"test_card" | "test_upi" | "test_wallet">("test_card")
+  const [selectedCardId, setSelectedCardId] = useState<FakeCreditCard["id"]>("visa_success")
+  const defaultSelectedCard = fakeCreditCards[0]
+  const [cardNumberInput, setCardNumberInput] = useState(defaultSelectedCard.number)
+  const [cardExpiryInput, setCardExpiryInput] = useState(defaultSelectedCard.expiry)
+  const [cardCvcInput, setCardCvcInput] = useState(defaultSelectedCard.cvc)
+  const [cardHolderInput, setCardHolderInput] = useState(defaultSelectedCard.holder)
 
   useEffect(() => {
     let isMounted = true
@@ -90,6 +136,37 @@ export default function CheckoutPageClient() {
   const platformFee = resolvedEvent.price > 0 ? PLATFORM_FEE : 0
   const totalAmount = ticketSubtotal + platformFee
   const isFreeEvent = resolvedEvent.price === 0
+  const selectedCard = fakeCreditCards.find((card) => card.id === selectedCardId) ?? fakeCreditCards[0]
+
+  const fillSelectedCardDetails = (cardId: FakeCreditCard["id"]) => {
+    const card = fakeCreditCards.find((item) => item.id === cardId)
+
+    if (!card) {
+      return
+    }
+
+    setSelectedCardId(card.id)
+    setCardNumberInput(card.number)
+    setCardExpiryInput(card.expiry)
+    setCardCvcInput(card.cvc)
+    setCardHolderInput(card.holder)
+  }
+
+  const formatCardNumber = (value: string) => {
+    const digits = value.replace(/\D/g, "").slice(0, 16)
+    const groups = digits.match(/.{1,4}/g)
+    return groups ? groups.join(" ") : ""
+  }
+
+  const formatCardExpiry = (value: string) => {
+    const digits = value.replace(/\D/g, "").slice(0, 4)
+
+    if (digits.length <= 2) {
+      return digits
+    }
+
+    return `${digits.slice(0, 2)}/${digits.slice(2)}`
+  }
 
   const handleBooking = async () => {
     setErrorMessage("")
@@ -110,8 +187,45 @@ export default function CheckoutPageClient() {
     let fakePaymentReference = ""
 
     if (!isFreeEvent) {
-      setSuccessMessage(`Processing test payment through ${paymentMethod.replace("test_", "")}...`)
+      if (paymentMethod === "test_card") {
+        const normalizedCardNumber = formatCardNumber(cardNumberInput)
+        const normalizedCardExpiry = formatCardExpiry(cardExpiryInput)
+        const normalizedCardCvc = cardCvcInput.replace(/\D/g, "").slice(0, 4)
+        const normalizedCardHolder = cardHolderInput.trim()
+
+        if (!normalizedCardNumber || !normalizedCardExpiry || !normalizedCardCvc || !normalizedCardHolder) {
+          setErrorMessage("Enter the fake card details before confirming the payment.")
+          setIsSubmitting(false)
+          return
+        }
+
+        if (
+          normalizedCardNumber !== selectedCard.number ||
+          normalizedCardExpiry !== selectedCard.expiry ||
+          normalizedCardCvc !== selectedCard.cvc ||
+          normalizedCardHolder.toLowerCase() !== selectedCard.holder.toLowerCase()
+        ) {
+          setErrorMessage("Use one of the shown fake test card details exactly to continue.")
+          setIsSubmitting(false)
+          return
+        }
+      }
+
+      const paymentLabel =
+        paymentMethod === "test_card"
+          ? `${selectedCard.brand} ending ${selectedCard.number.slice(-4)}`
+          : paymentMethod.replace("test_", "")
+
+      setSuccessMessage(`Processing payment through ${paymentLabel}...`)
       await new Promise((resolve) => window.setTimeout(resolve, 1200))
+
+      if (paymentMethod === "test_card" && selectedCard.result === "declined") {
+        setErrorMessage("This fake card was declined. Try a success test card to complete the booking.")
+        setSuccessMessage("")
+        setIsSubmitting(false)
+        return
+      }
+
       fakePaymentReference = `TESTPAY-${Date.now().toString().slice(-8)}`
     }
 
@@ -130,7 +244,7 @@ export default function CheckoutPageClient() {
       setSuccessMessage(
         isFreeEvent
           ? "Preview ticket created for testing. No real booking record was created because this is not a live organizer event."
-          : `Test payment successful (${fakePaymentReference}). Preview checkout completed. No real booking record was created because this is not a live organizer event.`
+          : `Payment successful (${fakePaymentReference}). Preview checkout completed. No real booking record was created because this is not a live organizer event.`
       )
       setIsSubmitting(false)
       return
@@ -176,7 +290,7 @@ export default function CheckoutPageClient() {
       source: "bookings",
     })
 
-    setSuccessMessage(isFreeEvent ? "Booking confirmed. Redirecting to My Tickets..." : `Test payment successful (${fakePaymentReference}). Booking confirmed. Redirecting to My Tickets...`)
+    setSuccessMessage(isFreeEvent ? "Booking confirmed. Redirecting to My Tickets..." : `Payment successful (${fakePaymentReference}). Booking confirmed. Redirecting to My Tickets...`)
     window.dispatchEvent(new Event("univa-booking-completed"))
 
     window.setTimeout(() => {
@@ -252,9 +366,9 @@ export default function CheckoutPageClient() {
                   <span style={labelStyle}>Test payment method</span>
                   <div style={paymentOptionsStyle}>
                     {[
-                      { value: "test_card", label: "Test Card" },
-                      { value: "test_upi", label: "Test UPI" },
-                      { value: "test_wallet", label: "Test Wallet" },
+                      { value: "test_card", label: "Card" },
+                      { value: "test_upi", label: "UPI" },
+                      { value: "test_wallet", label: "Wallet" },
                     ].map((option) => (
                       <button
                         key={option.value}
@@ -266,8 +380,80 @@ export default function CheckoutPageClient() {
                       </button>
                     ))}
                   </div>
+                  {paymentMethod === "test_card" && (
+                    <>
+                      <div style={fakeCardsGridStyle}>
+                        {fakeCreditCards.map((card) => (
+                          <button
+                            key={card.id}
+                            type="button"
+                            onClick={() => fillSelectedCardDetails(card.id)}
+                            style={selectedCardId === card.id ? activeFakeCardStyle : fakeCardStyle}
+                          >
+                            <span style={fakeCardBrandStyle}>{card.brand}</span>
+                            <span style={fakeCardNumberStyle}>{card.number}</span>
+                            <span style={fakeCardMetaStyle}>
+                              Exp {card.expiry} / CVC {card.cvc}
+                            </span>
+                            <span style={fakeCardHolderStyle}>{card.holder}</span>
+                          </button>
+                        ))}
+                      </div>
+
+                      <div style={fakeCardFormStyle}>
+                        <label style={fieldStyle}>
+                          <span style={labelStyle}>Card number</span>
+                          <input
+                            type="text"
+                            inputMode="numeric"
+                            placeholder="4242 4242 4242 4242"
+                            value={cardNumberInput}
+                            onChange={(event) => setCardNumberInput(formatCardNumber(event.target.value))}
+                            style={inputStyle}
+                          />
+                        </label>
+
+                        <div style={fakeCardInlineFieldsStyle}>
+                          <label style={fieldStyle}>
+                            <span style={labelStyle}>Expiry</span>
+                            <input
+                              type="text"
+                              inputMode="numeric"
+                              placeholder="MM/YY"
+                              value={cardExpiryInput}
+                              onChange={(event) => setCardExpiryInput(formatCardExpiry(event.target.value))}
+                              style={inputStyle}
+                            />
+                          </label>
+
+                          <label style={fieldStyle}>
+                            <span style={labelStyle}>CVC</span>
+                            <input
+                              type="text"
+                              inputMode="numeric"
+                              placeholder="123"
+                              value={cardCvcInput}
+                              onChange={(event) => setCardCvcInput(event.target.value.replace(/\D/g, "").slice(0, 4))}
+                              style={inputStyle}
+                            />
+                          </label>
+                        </div>
+
+                        <label style={fieldStyle}>
+                          <span style={labelStyle}>Cardholder name</span>
+                          <input
+                            type="text"
+                            placeholder="Univa Test User"
+                            value={cardHolderInput}
+                            onChange={(event) => setCardHolderInput(event.target.value)}
+                            style={inputStyle}
+                          />
+                        </label>
+                      </div>
+                    </>
+                  )}
                   <p style={paymentHintStyle}>
-                    This is a fake payment integration for testing. No real money will be charged.
+                    Use the sample card details below to complete the payment flow. No real money will be charged.
                   </p>
                 </div>
               )}
@@ -304,12 +490,12 @@ export default function CheckoutPageClient() {
                 {isSubmitting
                   ? isFreeEvent
                     ? "Creating Free Ticket..."
-                    : "Processing Test Payment..."
+                    : "Processing Payment..."
                   : isLiveEvent && resolvedEvent.available_tickets === 0
                     ? "Sold Out"
-                    : isFreeEvent
+                  : isFreeEvent
                       ? "Get Free Ticket"
-                      : "Pay & Confirm (Test)"}
+                      : "Pay & Confirm"}
               </button>
             </section>
           </div>
@@ -480,6 +666,70 @@ const activePaymentOptionStyle = {
   background: "#ff7a00",
   border: "1px solid #ff7a00",
   color: "white",
+}
+
+const fakeCardsGridStyle = {
+  display: "grid",
+  gap: "10px",
+}
+
+const fakeCardFormStyle = {
+  display: "grid",
+  gap: "12px",
+  padding: "16px",
+  borderRadius: "16px",
+  background: "rgba(255,255,255,0.75)",
+}
+
+const fakeCardInlineFieldsStyle = {
+  display: "grid",
+  gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+  gap: "12px",
+}
+
+const fakeCardStyle = {
+  display: "grid",
+  gap: "6px",
+  width: "100%",
+  padding: "14px",
+  border: "1px solid #f0c7b2",
+  borderRadius: "16px",
+  background: "linear-gradient(135deg, #ffffff, #fffaf7)",
+  color: "#2d2550",
+  textAlign: "left" as const,
+  cursor: "pointer",
+}
+
+const activeFakeCardStyle = {
+  ...fakeCardStyle,
+  border: "1px solid #ff7a00",
+  boxShadow: "0 10px 24px rgba(255,122,0,0.18)",
+}
+
+const fakeCardBrandStyle = {
+  fontSize: "12px",
+  color: "#ff7a00",
+  fontWeight: "800",
+  textTransform: "uppercase" as const,
+  letterSpacing: "0.08em",
+}
+
+const fakeCardNumberStyle = {
+  fontSize: "16px",
+  color: "#241c3e",
+  fontWeight: "800",
+  letterSpacing: "0.04em",
+}
+
+const fakeCardMetaStyle = {
+  fontSize: "13px",
+  color: "#7b5a4d",
+  fontWeight: "700",
+}
+
+const fakeCardHolderStyle = {
+  fontSize: "13px",
+  color: "#5d547e",
 }
 
 const paymentHintStyle = {

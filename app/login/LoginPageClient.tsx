@@ -9,11 +9,45 @@ type LoginPageClientProps = {
 }
 
 const countryCodeOptions = [
-  { value: "+91", label: "+91 India" },
-  { value: "+1", label: "+1 USA" },
-  { value: "+44", label: "+44 UK" },
-  { value: "+971", label: "+971 UAE" },
+  {
+    value: "+91",
+    label: "+91 India",
+    placeholder: "Enter 10-digit Indian mobile number",
+    maxLength: 10,
+    helper: "Registration is not required. Enter your Indian mobile number and we will send OTP with +91 country code.",
+  },
+  {
+    value: "+1",
+    label: "+1 USA",
+    placeholder: "Enter 10-digit US mobile number",
+    maxLength: 10,
+    helper: "Registration is not required. Enter your US mobile number and we will send OTP with +1 country code.",
+  },
+  {
+    value: "+44",
+    label: "+44 UK",
+    placeholder: "Enter UK mobile number",
+    maxLength: 11,
+    helper: "Registration is not required. Enter your UK mobile number and we will send OTP with +44 country code.",
+  },
+  {
+    value: "+971",
+    label: "+971 UAE",
+    placeholder: "Enter UAE mobile number",
+    maxLength: 10,
+    helper: "Registration is not required. Enter your UAE mobile number and we will send OTP with +971 country code.",
+  },
 ]
+
+const getAuthRequestErrorMessage = (error: unknown) => {
+  const message = error instanceof Error ? error.message : ""
+
+  if (message.toLowerCase().includes("failed to fetch")) {
+    return "Could not connect to Supabase to send OTP. Please check internet connection, Supabase URL/key, and SMS provider settings."
+  }
+
+  return message || "Something went wrong while contacting Supabase. Please try again."
+}
 
 export default function LoginPageClient({
   authMessage,
@@ -35,20 +69,27 @@ export default function LoginPageClient({
 
   const router = useRouter()
   const statusMessage = message || authMessage
+  const selectedCountry =
+    countryCodeOptions.find((option) => option.value === countryCode) ??
+    countryCodeOptions[0]
 
   useEffect(() => {
     let isMounted = true
 
     const resetLoginSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession()
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession()
 
-      if (!isMounted || !session) {
-        return
+        if (!isMounted || !session) {
+          return
+        }
+
+        await supabase.auth.signOut()
+      } catch {
+        // Keep the login form usable even if the auth session refresh request fails.
       }
-
-      await supabase.auth.signOut()
     }
 
     resetLoginSession()
@@ -70,30 +111,17 @@ export default function LoginPageClient({
       if (trimmedValue.length === 11 && trimmedValue.startsWith("0")) {
         trimmedValue = trimmedValue.slice(1)
       }
-      if (trimmedValue.length === 12 && trimmedValue.startsWith("91")) {
-        trimmedValue = trimmedValue.slice(2)
-      }
-    }
-
-    if (dialCode === "+1" && trimmedValue.length === 11 && trimmedValue.startsWith("1")) {
-      trimmedValue = trimmedValue.slice(1)
     }
 
     if (dialCode === "+44") {
       if (trimmedValue.startsWith("0")) {
         trimmedValue = trimmedValue.slice(1)
       }
-      if (trimmedValue.startsWith("44")) {
-        trimmedValue = trimmedValue.slice(2)
-      }
     }
 
     if (dialCode === "+971") {
       if (trimmedValue.startsWith("0")) {
         trimmedValue = trimmedValue.slice(1)
-      }
-      if (trimmedValue.startsWith("971")) {
-        trimmedValue = trimmedValue.slice(3)
       }
     }
 
@@ -146,22 +174,27 @@ export default function LoginPageClient({
     setMessage("")
     setLoading(true)
 
-    const { error: signInError } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        shouldCreateUser: true,
-      },
-    })
+    try {
+      const { error: signInError } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          shouldCreateUser: true,
+        },
+      })
 
-    setLoading(false)
+      setLoading(false)
 
-    if (signInError) {
-      setError(signInError.message)
-      return
+      if (signInError) {
+        setError(signInError.message)
+        return
+      }
+
+      setEmailOtpSent(true)
+      setMessage("OTP sent to your email.")
+    } catch (authError) {
+      setLoading(false)
+      setError(getAuthRequestErrorMessage(authError))
     }
-
-    setEmailOtpSent(true)
-    setMessage("OTP sent to your email.")
   }
 
   const handleVerifyEmailOtp = async (event: FormEvent<HTMLFormElement>) => {
@@ -170,20 +203,25 @@ export default function LoginPageClient({
     setMessage("")
     setLoading(true)
 
-    const { error: verifyError } = await supabase.auth.verifyOtp({
-      email,
-      token: emailOtp,
-      type: "email",
-    })
+    try {
+      const { error: verifyError } = await supabase.auth.verifyOtp({
+        email,
+        token: emailOtp,
+        type: "email",
+      })
 
-    setLoading(false)
+      setLoading(false)
 
-    if (verifyError) {
-      setError(verifyError.message)
-      return
+      if (verifyError) {
+        setError(verifyError.message)
+        return
+      }
+
+      router.push("/")
+    } catch (authError) {
+      setLoading(false)
+      setError(getAuthRequestErrorMessage(authError))
     }
-
-    router.push("/")
   }
 
   const handleSendMobileOtp = async (event: FormEvent<HTMLFormElement>) => {
@@ -206,19 +244,27 @@ export default function LoginPageClient({
 
     setLoading(true)
 
-    const { error: signInError } = await supabase.auth.signInWithOtp({
-      phone: normalizedPhone,
-    })
+    try {
+      const { error: signInError } = await supabase.auth.signInWithOtp({
+        phone: normalizedPhone,
+        options: {
+          shouldCreateUser: true,
+        },
+      })
 
-    setLoading(false)
+      setLoading(false)
 
-    if (signInError) {
-      setError(signInError.message)
-      return
+      if (signInError) {
+        setError(signInError.message)
+        return
+      }
+
+      setMobileOtpSent(true)
+      setMessage(`OTP sent to ${normalizedPhone}. Registration is not required. Enter the code to continue.`)
+    } catch (authError) {
+      setLoading(false)
+      setError(getAuthRequestErrorMessage(authError))
     }
-
-    setMobileOtpSent(true)
-    setMessage(`OTP request sent to ${normalizedPhone}. If you do not receive it, check your SMS provider logs.`)
   }
 
   const handleVerifyMobileOtp = async (event: FormEvent<HTMLFormElement>) => {
@@ -241,20 +287,25 @@ export default function LoginPageClient({
 
     setLoading(true)
 
-    const { error: verifyError } = await supabase.auth.verifyOtp({
-      phone: normalizedPhone,
-      token: mobileOtp,
-      type: "sms",
-    })
+    try {
+      const { error: verifyError } = await supabase.auth.verifyOtp({
+        phone: normalizedPhone,
+        token: mobileOtp,
+        type: "sms",
+      })
 
-    setLoading(false)
+      setLoading(false)
 
-    if (verifyError) {
-      setError(verifyError.message)
-      return
+      if (verifyError) {
+        setError(verifyError.message)
+        return
+      }
+
+      router.push("/")
+    } catch (authError) {
+      setLoading(false)
+      setError(getAuthRequestErrorMessage(authError))
     }
-
-    router.push("/")
   }
 
   const handleOAuthLogin = async (provider: "google" | "apple") => {
@@ -265,23 +316,28 @@ export default function LoginPageClient({
     const redirectTo =
       typeof window !== "undefined" ? `${window.location.origin}/` : undefined
 
-    const { error: oauthError } = await supabase.auth.signInWithOAuth({
-      provider,
-      options: {
-        redirectTo,
-      },
-    })
+    try {
+      const { error: oauthError } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo,
+        },
+      })
 
-    if (oauthError) {
+      if (oauthError) {
+        setProviderLoading(null)
+        setError(oauthError.message)
+      }
+    } catch (authError) {
       setProviderLoading(null)
-      setError(oauthError.message)
+      setError(getAuthRequestErrorMessage(authError))
     }
   }
 
   return (
     <div style={container}>
       <div style={card}>
-        <h2 style={titleStyle}>Login to proceed</h2>
+        <h2 style={titleStyle}>Login with OTP</h2>
 
         {statusMessage && <p style={successMessage}>{statusMessage}</p>}
         {error && <p style={errorMessage}>{error}</p>}
@@ -324,7 +380,7 @@ export default function LoginPageClient({
             }}
             style={loginType === "mobile" ? activeTab : normalTab}
           >
-            Continue with Mobile
+            Mobile OTP
           </button>
 
           <button
@@ -338,7 +394,7 @@ export default function LoginPageClient({
             }}
             style={loginType === "email" ? activeTab : normalTab}
           >
-            Continue with Email
+            Email OTP
           </button>
         </div>
 
@@ -349,7 +405,14 @@ export default function LoginPageClient({
                 <span style={fieldLabelStyle}>Country Code</span>
                 <select
                   value={countryCode}
-                  onChange={(event) => setCountryCode(event.target.value)}
+                  onChange={(event) => {
+                    setCountryCode(event.target.value)
+                    setMobile("")
+                    setMobileOtp("")
+                    setMobileOtpSent(false)
+                    setError("")
+                    setMessage("")
+                  }}
                   style={countryCodeInputStyle}
                 >
                   {countryCodeOptions.map((option) => (
@@ -364,11 +427,16 @@ export default function LoginPageClient({
                 <span style={fieldLabelStyle}>Mobile Number</span>
                 <input
                   type="tel"
-                  placeholder="Enter 10-digit mobile number"
+                  placeholder={selectedCountry.placeholder}
                   value={mobile}
                   onChange={(event) =>
-                    setMobile(event.target.value.replace(/\D/g, "").slice(0, 10))
+                    setMobile(
+                      event.target.value
+                        .replace(/\D/g, "")
+                        .slice(0, selectedCountry.maxLength)
+                    )
                   }
+                  maxLength={selectedCountry.maxLength}
                   autoComplete="tel-national"
                   inputMode="tel"
                   style={mobileInputStyle}
@@ -389,8 +457,8 @@ export default function LoginPageClient({
 
             <p style={helperText}>
               {mobileOtpSent
-                ? "Enter the OTP sent to your mobile number."
-                : "Enter your country code and 10-digit mobile number to receive an OTP."}
+                ? `Enter the OTP sent to ${normalizePhoneNumber(countryCode, mobile) ?? "your mobile number"}.`
+                : selectedCountry.helper}
             </p>
 
             <button style={orangeSubmitBtn} disabled={loading || providerLoading !== null}>
@@ -400,7 +468,7 @@ export default function LoginPageClient({
                   : "Sending OTP..."
                 : mobileOtpSent
                   ? "Verify OTP"
-                  : "Continue with Mobile"}
+                  : "Send OTP"}
             </button>
           </form>
         ) : (
@@ -438,7 +506,7 @@ export default function LoginPageClient({
                   : "Sending OTP..."
                 : emailOtpSent
                   ? "Verify OTP"
-                  : "Continue with Email"}
+                  : "Send OTP"}
             </button>
           </form>
         )}

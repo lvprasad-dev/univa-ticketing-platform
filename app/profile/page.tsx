@@ -109,11 +109,6 @@ export default function ProfilePage() {
       return
     }
 
-    if (!trimmedEmail) {
-      setMessage("Email is required.")
-      return
-    }
-
     const updatePayload: {
       data: { full_name: string }
       email?: string
@@ -121,7 +116,7 @@ export default function ProfilePage() {
       data: { full_name: trimmedName },
     }
 
-    if (trimmedEmail !== profileEmail) {
+    if (trimmedEmail && trimmedEmail !== profileEmail) {
       updatePayload.email = trimmedEmail
     }
 
@@ -150,7 +145,7 @@ export default function ProfilePage() {
     setIsEditingName(false)
     setIsEditingEmail(false)
     setMessage(
-      trimmedEmail !== profileEmail
+      trimmedEmail && trimmedEmail !== profileEmail
         ? "Profile updated. Check your inbox if email confirmation is required."
         : "Profile updated successfully."
     )
@@ -221,7 +216,7 @@ export default function ProfilePage() {
                 <input
                   type="email"
                   value={editableEmail}
-                  placeholder="Enter email"
+                  placeholder="Add email (optional)"
                   onChange={(event) => setEditableEmail(event.target.value)}
                   readOnly={!isEditingEmail}
                   style={isEditingEmail ? editableInputWithIconStyle : readonlyInputWithIconStyle}
