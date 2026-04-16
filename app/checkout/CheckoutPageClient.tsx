@@ -111,6 +111,15 @@ export default function CheckoutPageClient() {
     return `${digits.slice(0, 2)}/${digits.slice(2)}`
   }
 
+  const pushPaymentNotification = (title: string, message: string) => {
+    pushNotification({
+      title,
+      message,
+      href: "/my-tickets",
+      source: "bookings",
+    })
+  }
+
   const handleBooking = async () => {
     setErrorMessage("")
     setSuccessMessage("")
@@ -186,6 +195,12 @@ export default function CheckoutPageClient() {
     }
 
     if (!event || !isLiveEvent) {
+      pushPaymentNotification(
+        "Payment Successful",
+        isFreeEvent
+          ? "Your free ticket preview was confirmed successfully."
+          : `Your payment was successful (${fakePaymentReference}) and the ticket preview was confirmed.`
+      )
       setSuccessMessage(
         isFreeEvent
           ? "Preview ticket created for testing. No real booking record was created because this is not a live organizer event."
@@ -195,45 +210,57 @@ export default function CheckoutPageClient() {
       return
     }
 
-    const response = await fetch("/api/bookings", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${session.access_token}`,
-      },
-      body: JSON.stringify({
-        event_id: event.id,
-        user_id: session.user.id,
-        quantity,
-        total_amount: totalAmount,
-        booking_status: "confirmed",
-      }),
-    })
+    try {
+      const response = await fetch("/api/bookings", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          event_id: event.id,
+          user_id: session.user.id,
+          quantity,
+          total_amount: totalAmount,
+          booking_status: "confirmed",
+        }),
+      })
 
-    const payload = (await response.json()) as {
-      booking?: { id: string }
-      event?: EventRecord
-      error?: string
-    }
+      const payload = (await response.json()) as {
+        booking?: { id: string }
+        event?: EventRecord
+        error?: string
+      }
 
-    if (!response.ok) {
-      setErrorMessage(payload.error ?? "Failed to complete booking.")
+      if (!response.ok) {
+        pushPaymentNotification(
+          "Payment Failed",
+          payload.error ?? "Your payment could not be completed. Please try again."
+        )
+        setErrorMessage(payload.error ?? "Failed to complete booking.")
+        setIsSubmitting(false)
+        return
+      }
+
+      if (payload.event) {
+        setEvent(payload.event)
+      }
+    } catch {
+      pushPaymentNotification(
+        "Payment Failed",
+        "Your payment could not be completed because of a network issue. Please try again."
+      )
+      setErrorMessage("Failed to complete booking.")
       setIsSubmitting(false)
       return
     }
 
-    if (payload.event) {
-      setEvent(payload.event)
-    }
-
-    pushNotification({
-      title: isFreeEvent ? "Free Ticket Confirmed" : "Booking Confirmed",
-      message: `${event.title} booking is confirmed for ${quantity} ticket(s) at ${event.venue}, ${event.city}. Event time: ${new Date(event.event_date).toLocaleString()}. ${
+    pushPaymentNotification(
+      isFreeEvent ? "Free Ticket Confirmed" : "Payment Successful",
+      `${event.title} booking is confirmed for ${quantity} ticket(s) at ${event.venue}, ${event.city}. Event time: ${new Date(event.event_date).toLocaleString()}. ${
         isFreeEvent ? "No payment was required." : `Total paid: Rs.${totalAmount}.`
-      }`,
-      href: "/my-tickets",
-      source: "bookings",
-    })
+      }`
+    )
 
     setSuccessMessage(isFreeEvent ? "Booking confirmed. Redirecting to My Tickets..." : `Payment successful (${fakePaymentReference}). Booking confirmed. Redirecting to My Tickets...`)
     window.dispatchEvent(new Event("univa-booking-completed"))
