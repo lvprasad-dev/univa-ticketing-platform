@@ -381,9 +381,6 @@ export default function CheckoutPageClient() {
                         />
                       </label>
 
-                      <p style={sampleCardDetailsStyle}>
-                        Sample card: {sampleFakeCreditCard.number} | Exp {sampleFakeCreditCard.expiry} | CVC {sampleFakeCreditCard.cvc} | {sampleFakeCreditCard.holder}
-                      </p>
                     </div>
                   )}
                   <p style={paymentHintStyle}>
@@ -614,13 +611,6 @@ const fakeCardInlineFieldsStyle = {
   display: "grid",
   gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
   gap: "12px",
-}
-
-const sampleCardDetailsStyle = {
-  margin: 0,
-  color: "#7b5a4d",
-  fontSize: "13px",
-  lineHeight: 1.6,
 }
 
 const paymentHintStyle = {
