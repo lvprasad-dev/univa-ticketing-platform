@@ -20,44 +20,18 @@ type EventRecord = {
 const PLATFORM_FEE = 11
 
 type FakeCreditCard = {
-  id: "visa_success" | "mastercard_success" | "declined"
-  brand: string
   number: string
   expiry: string
   cvc: string
   holder: string
-  result: "success" | "declined"
 }
 
-const fakeCreditCards: FakeCreditCard[] = [
-  {
-    id: "visa_success",
-    brand: "Visa",
-    number: "4242 4242 4242 4242",
-    expiry: "12/34",
-    cvc: "123",
-    holder: "Univa Test User",
-    result: "success",
-  },
-  {
-    id: "mastercard_success",
-    brand: "Mastercard",
-    number: "5555 5555 5555 4444",
-    expiry: "11/34",
-    cvc: "321",
-    holder: "Univa Demo Guest",
-    result: "success",
-  },
-  {
-    id: "declined",
-    brand: "Declined Card",
-    number: "4000 0000 0000 0002",
-    expiry: "10/34",
-    cvc: "999",
-    holder: "Univa Failed Payment",
-    result: "declined",
-  },
-]
+const sampleFakeCreditCard: FakeCreditCard = {
+  number: "4242 4242 4242 4242",
+  expiry: "12/34",
+  cvc: "123",
+  holder: "Univa Card Holder",
+}
 
 export default function CheckoutPageClient() {
   const router = useRouter()
@@ -79,12 +53,10 @@ export default function CheckoutPageClient() {
   const [errorMessage, setErrorMessage] = useState("")
   const [successMessage, setSuccessMessage] = useState("")
   const [paymentMethod, setPaymentMethod] = useState<"test_card" | "test_upi" | "test_wallet">("test_card")
-  const [selectedCardId, setSelectedCardId] = useState<FakeCreditCard["id"]>("visa_success")
-  const defaultSelectedCard = fakeCreditCards[0]
-  const [cardNumberInput, setCardNumberInput] = useState(defaultSelectedCard.number)
-  const [cardExpiryInput, setCardExpiryInput] = useState(defaultSelectedCard.expiry)
-  const [cardCvcInput, setCardCvcInput] = useState(defaultSelectedCard.cvc)
-  const [cardHolderInput, setCardHolderInput] = useState(defaultSelectedCard.holder)
+  const [cardNumberInput, setCardNumberInput] = useState(sampleFakeCreditCard.number)
+  const [cardExpiryInput, setCardExpiryInput] = useState(sampleFakeCreditCard.expiry)
+  const [cardCvcInput, setCardCvcInput] = useState(sampleFakeCreditCard.cvc)
+  const [cardHolderInput, setCardHolderInput] = useState(sampleFakeCreditCard.holder)
 
   useEffect(() => {
     let isMounted = true
@@ -136,21 +108,6 @@ export default function CheckoutPageClient() {
   const platformFee = resolvedEvent.price > 0 ? PLATFORM_FEE : 0
   const totalAmount = ticketSubtotal + platformFee
   const isFreeEvent = resolvedEvent.price === 0
-  const selectedCard = fakeCreditCards.find((card) => card.id === selectedCardId) ?? fakeCreditCards[0]
-
-  const fillSelectedCardDetails = (cardId: FakeCreditCard["id"]) => {
-    const card = fakeCreditCards.find((item) => item.id === cardId)
-
-    if (!card) {
-      return
-    }
-
-    setSelectedCardId(card.id)
-    setCardNumberInput(card.number)
-    setCardExpiryInput(card.expiry)
-    setCardCvcInput(card.cvc)
-    setCardHolderInput(card.holder)
-  }
 
   const formatCardNumber = (value: string) => {
     const digits = value.replace(/\D/g, "").slice(0, 16)
@@ -200,12 +157,12 @@ export default function CheckoutPageClient() {
         }
 
         if (
-          normalizedCardNumber !== selectedCard.number ||
-          normalizedCardExpiry !== selectedCard.expiry ||
-          normalizedCardCvc !== selectedCard.cvc ||
-          normalizedCardHolder.toLowerCase() !== selectedCard.holder.toLowerCase()
+          normalizedCardNumber !== sampleFakeCreditCard.number ||
+          normalizedCardExpiry !== sampleFakeCreditCard.expiry ||
+          normalizedCardCvc !== sampleFakeCreditCard.cvc ||
+          normalizedCardHolder.toLowerCase() !== sampleFakeCreditCard.holder.toLowerCase()
         ) {
-          setErrorMessage("Use one of the shown fake test card details exactly to continue.")
+          setErrorMessage("Use the shown sample card details exactly to continue.")
           setIsSubmitting(false)
           return
         }
@@ -213,18 +170,11 @@ export default function CheckoutPageClient() {
 
       const paymentLabel =
         paymentMethod === "test_card"
-          ? `${selectedCard.brand} ending ${selectedCard.number.slice(-4)}`
+          ? `card ending ${formatCardNumber(cardNumberInput).slice(-4)}`
           : paymentMethod.replace("test_", "")
 
       setSuccessMessage(`Processing payment through ${paymentLabel}...`)
       await new Promise((resolve) => window.setTimeout(resolve, 1200))
-
-      if (paymentMethod === "test_card" && selectedCard.result === "declined") {
-        setErrorMessage("This fake card was declined. Try a success test card to complete the booking.")
-        setSuccessMessage("")
-        setIsSubmitting(false)
-        return
-      }
 
       fakePaymentReference = `TESTPAY-${Date.now().toString().slice(-8)}`
     }
@@ -381,76 +331,60 @@ export default function CheckoutPageClient() {
                     ))}
                   </div>
                   {paymentMethod === "test_card" && (
-                    <>
-                      <div style={fakeCardsGridStyle}>
-                        {fakeCreditCards.map((card) => (
-                          <button
-                            key={card.id}
-                            type="button"
-                            onClick={() => fillSelectedCardDetails(card.id)}
-                            style={selectedCardId === card.id ? activeFakeCardStyle : fakeCardStyle}
-                          >
-                            <span style={fakeCardBrandStyle}>{card.brand}</span>
-                            <span style={fakeCardNumberStyle}>{card.number}</span>
-                            <span style={fakeCardMetaStyle}>
-                              Exp {card.expiry} / CVC {card.cvc}
-                            </span>
-                            <span style={fakeCardHolderStyle}>{card.holder}</span>
-                          </button>
-                        ))}
-                      </div>
+                    <div style={fakeCardFormStyle}>
+                      <label style={fieldStyle}>
+                        <span style={labelStyle}>Card number</span>
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          placeholder="4242 4242 4242 4242"
+                          value={cardNumberInput}
+                          onChange={(event) => setCardNumberInput(formatCardNumber(event.target.value))}
+                          style={inputStyle}
+                        />
+                      </label>
 
-                      <div style={fakeCardFormStyle}>
+                      <div style={fakeCardInlineFieldsStyle}>
                         <label style={fieldStyle}>
-                          <span style={labelStyle}>Card number</span>
+                          <span style={labelStyle}>Expiry</span>
                           <input
                             type="text"
                             inputMode="numeric"
-                            placeholder="4242 4242 4242 4242"
-                            value={cardNumberInput}
-                            onChange={(event) => setCardNumberInput(formatCardNumber(event.target.value))}
+                            placeholder="MM/YY"
+                            value={cardExpiryInput}
+                            onChange={(event) => setCardExpiryInput(formatCardExpiry(event.target.value))}
                             style={inputStyle}
                           />
                         </label>
 
-                        <div style={fakeCardInlineFieldsStyle}>
-                          <label style={fieldStyle}>
-                            <span style={labelStyle}>Expiry</span>
-                            <input
-                              type="text"
-                              inputMode="numeric"
-                              placeholder="MM/YY"
-                              value={cardExpiryInput}
-                              onChange={(event) => setCardExpiryInput(formatCardExpiry(event.target.value))}
-                              style={inputStyle}
-                            />
-                          </label>
-
-                          <label style={fieldStyle}>
-                            <span style={labelStyle}>CVC</span>
-                            <input
-                              type="text"
-                              inputMode="numeric"
-                              placeholder="123"
-                              value={cardCvcInput}
-                              onChange={(event) => setCardCvcInput(event.target.value.replace(/\D/g, "").slice(0, 4))}
-                              style={inputStyle}
-                            />
-                          </label>
-                        </div>
-
                         <label style={fieldStyle}>
-                          <span style={labelStyle}>Cardholder name</span>
+                          <span style={labelStyle}>CVC</span>
                           <input
                             type="text"
-                            placeholder="Univa Test User"
-                            value={cardHolderInput}
-                            onChange={(event) => setCardHolderInput(event.target.value)}
+                            inputMode="numeric"
+                            placeholder="123"
+                            value={cardCvcInput}
+                            onChange={(event) => setCardCvcInput(event.target.value.replace(/\D/g, "").slice(0, 4))}
                             style={inputStyle}
                           />
                         </label>
                       </div>
-                    </>
+
+                      <label style={fieldStyle}>
+                        <span style={labelStyle}>Cardholder name</span>
+                        <input
+                          type="text"
+                          placeholder="Univa Card Holder"
+                          value={cardHolderInput}
+                          onChange={(event) => setCardHolderInput(event.target.value)}
+                          style={inputStyle}
+                        />
+                      </label>
+
+                      <p style={sampleCardDetailsStyle}>
+                        Sample card: {sampleFakeCreditCard.number} | Exp {sampleFakeCreditCard.expiry} | CVC {sampleFakeCreditCard.cvc} | {sampleFakeCreditCard.holder}
+                      </p>
+                    </div>
                   )}
                   <p style={paymentHintStyle}>
                     Use the sample card details below to complete the payment flow. No real money will be charged.
@@ -668,11 +602,6 @@ const activePaymentOptionStyle = {
   color: "white",
 }
 
-const fakeCardsGridStyle = {
-  display: "grid",
-  gap: "10px",
-}
-
 const fakeCardFormStyle = {
   display: "grid",
   gap: "12px",
@@ -687,49 +616,11 @@ const fakeCardInlineFieldsStyle = {
   gap: "12px",
 }
 
-const fakeCardStyle = {
-  display: "grid",
-  gap: "6px",
-  width: "100%",
-  padding: "14px",
-  border: "1px solid #f0c7b2",
-  borderRadius: "16px",
-  background: "linear-gradient(135deg, #ffffff, #fffaf7)",
-  color: "#2d2550",
-  textAlign: "left" as const,
-  cursor: "pointer",
-}
-
-const activeFakeCardStyle = {
-  ...fakeCardStyle,
-  border: "1px solid #ff7a00",
-  boxShadow: "0 10px 24px rgba(255,122,0,0.18)",
-}
-
-const fakeCardBrandStyle = {
-  fontSize: "12px",
-  color: "#ff7a00",
-  fontWeight: "800",
-  textTransform: "uppercase" as const,
-  letterSpacing: "0.08em",
-}
-
-const fakeCardNumberStyle = {
-  fontSize: "16px",
-  color: "#241c3e",
-  fontWeight: "800",
-  letterSpacing: "0.04em",
-}
-
-const fakeCardMetaStyle = {
-  fontSize: "13px",
+const sampleCardDetailsStyle = {
+  margin: 0,
   color: "#7b5a4d",
-  fontWeight: "700",
-}
-
-const fakeCardHolderStyle = {
   fontSize: "13px",
-  color: "#5d547e",
+  lineHeight: 1.6,
 }
 
 const paymentHintStyle = {
