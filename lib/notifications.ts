@@ -137,6 +137,17 @@ export const getNotificationHeading = (notification: AppNotification, index: num
 
 export const getNotifications = () => readNotifications()
 
+export const retainBookingNotificationsOnly = () => {
+  const notifications = readNotifications()
+  const nextNotifications = notifications.filter(
+    (notification) => notification.source === "bookings"
+  )
+
+  if (nextNotifications.length !== notifications.length) {
+    writeNotifications(nextNotifications)
+  }
+}
+
 export const getUnreadNotificationCount = () =>
   readNotifications().filter((notification) => !notification.isRead).length
 

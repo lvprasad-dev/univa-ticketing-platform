@@ -18,6 +18,7 @@ import {
   getNotifications,
   getUnreadNotificationCount,
   markNotificationRead,
+  retainBookingNotificationsOnly,
   subscribeToNotifications,
   type AppNotification,
 } from "@/lib/notifications"
@@ -271,6 +272,10 @@ export default function Navbar() {
         setLocation(DEFAULT_CITY)
       }
     )
+  }, [])
+
+  useEffect(() => {
+    retainBookingNotificationsOnly()
   }, [])
 
   useEffect(() => {
