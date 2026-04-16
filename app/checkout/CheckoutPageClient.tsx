@@ -53,10 +53,10 @@ export default function CheckoutPageClient() {
   const [errorMessage, setErrorMessage] = useState("")
   const [successMessage, setSuccessMessage] = useState("")
   const [paymentMethod, setPaymentMethod] = useState<"test_card" | "test_upi" | "test_wallet">("test_card")
-  const [cardNumberInput, setCardNumberInput] = useState(sampleFakeCreditCard.number)
-  const [cardExpiryInput, setCardExpiryInput] = useState(sampleFakeCreditCard.expiry)
-  const [cardCvcInput, setCardCvcInput] = useState(sampleFakeCreditCard.cvc)
-  const [cardHolderInput, setCardHolderInput] = useState(sampleFakeCreditCard.holder)
+  const [cardNumberInput, setCardNumberInput] = useState("")
+  const [cardExpiryInput, setCardExpiryInput] = useState("")
+  const [cardCvcInput, setCardCvcInput] = useState("")
+  const [cardHolderInput, setCardHolderInput] = useState("")
 
   useEffect(() => {
     let isMounted = true
@@ -337,7 +337,7 @@ export default function CheckoutPageClient() {
                         <input
                           type="text"
                           inputMode="numeric"
-                          placeholder="4242 4242 4242 4242"
+                          placeholder="Enter card number"
                           value={cardNumberInput}
                           onChange={(event) => setCardNumberInput(formatCardNumber(event.target.value))}
                           style={inputStyle}
@@ -350,7 +350,7 @@ export default function CheckoutPageClient() {
                           <input
                             type="text"
                             inputMode="numeric"
-                            placeholder="MM/YY"
+                            placeholder="Enter expiry"
                             value={cardExpiryInput}
                             onChange={(event) => setCardExpiryInput(formatCardExpiry(event.target.value))}
                             style={inputStyle}
@@ -362,7 +362,7 @@ export default function CheckoutPageClient() {
                           <input
                             type="text"
                             inputMode="numeric"
-                            placeholder="123"
+                            placeholder="Enter CVV"
                             value={cardCvcInput}
                             onChange={(event) => setCardCvcInput(event.target.value.replace(/\D/g, "").slice(0, 4))}
                             style={inputStyle}
@@ -374,7 +374,7 @@ export default function CheckoutPageClient() {
                         <span style={labelStyle}>Cardholder name</span>
                         <input
                           type="text"
-                          placeholder="Univa Card Holder"
+                          placeholder="Enter cardholder name"
                           value={cardHolderInput}
                           onChange={(event) => setCardHolderInput(event.target.value)}
                           style={inputStyle}
