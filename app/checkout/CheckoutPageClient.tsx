@@ -383,9 +383,6 @@ export default function CheckoutPageClient() {
 
                     </div>
                   )}
-                  <p style={paymentHintStyle}>
-                    Use the sample card details below to complete the payment flow. No real money will be charged.
-                  </p>
                 </div>
               )}
 
@@ -613,11 +610,6 @@ const fakeCardInlineFieldsStyle = {
   gap: "12px",
 }
 
-const paymentHintStyle = {
-  margin: 0,
-  color: "#7b5a4d",
-  lineHeight: 1.6,
-}
 const fareBoxStyle = {
   display: "grid",
   gap: "12px",
